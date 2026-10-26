@@ -1,5 +1,10 @@
 # Pulso
 
+## Documentación del repositorio
+
+- [Índice de archivos](.agents/docs/archivos.md): catálogo de archivos versionados con una descripción de cada uno.
+- [Descripción de carpetas](.agents/docs/carpetas.md): resumen de la organización del proyecto.
+
 - Description: This is a app built for personal improvement. Training
 - Stack: ReactNative + NativeWind + pnpm
 - Workflow: Always follow this workflow: 

@@ -1,0 +1,35 @@
+# Carpetas del proyecto
+
+- `.agents/docs/` — Documentación de referencia para navegar el repositorio.
+- `.claude/` — Configuración local del asistente Claude Code versionada para el proyecto.
+- `.codegraph/` — Configuración/artefactos de Codegraph; puede contener datos generados localmente.
+- `.github/` — Guías de contribución, políticas, plantillas y automatizaciones de GitHub Actions.
+- `.github/policies/` — Políticas del repositorio.
+- `.github/workflows/` — Flujos automatizados de integración y compilación.
+- `.vscode/` — Configuración y extensiones recomendadas para VS Code.
+- `__mocks__/` — Mocks globales de módulos usados por las pruebas.
+- `assets/` — Recursos visuales y gráficos de la aplicación.
+- `assets/expo.icon/` — Fuentes y configuración del icono de Expo.
+- `assets/expo.icon/Assets/` — Gráficos fuente del icono de Expo.
+- `assets/images/` — Iconos, logotipos e imágenes rasterizadas.
+- `assets/images/tabIcons/` — Iconos de navegación por pestañas y sus variantes de densidad.
+- `scripts/` — Scripts auxiliares para mantenimiento del proyecto.
+- `src/` — Código fuente de la aplicación.
+- `src/app/` — Rutas y pantallas Expo Router.
+- `src/app/(tabs)/` — Pantallas dentro de la navegación principal por pestañas.
+- `src/components/` — Componentes compartidos de interfaz.
+- `src/components/__tests__/` — Pruebas de componentes compartidos.
+- `src/components/intro/` — Componentes de introducción y onboarding.
+- `src/components/intro/__tests__/` — Pruebas de los componentes de onboarding.
+- `src/components/ui/` — Componentes UI básicos reutilizables.
+- `src/components/ui/__tests__/` — Pruebas de componentes UI.
+- `src/constants/` — Constantes de tema, colores y contenido estático.
+- `src/constants/__tests__/` — Pruebas de constantes y reglas de diseño.
+- `src/hooks/` — Hooks React reutilizables.
+- `src/providers/` — Proveedores de contexto/estado de la aplicación.
+- `src/providers/__tests__/` — Pruebas de proveedores.
+- `src/storage/` — Persistencia local y acceso a almacenamiento.
+- `src/storage/__tests__/` — Pruebas de persistencia.
+- `src/types/` — Tipos TypeScript compartidos.
+- `src/utils/` — Funciones auxiliares y lógica reutilizable.
+- `src/utils/__tests__/` — Pruebas de utilidades.
