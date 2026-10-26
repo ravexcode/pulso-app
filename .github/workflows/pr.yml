@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   checks:
-    name: Lint and typecheck
+    name: Lint, typecheck and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,4 +28,6 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Typecheck
-        run: pnpm exec tsc --noEmit
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test --ci
