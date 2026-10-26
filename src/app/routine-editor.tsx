@@ -5,6 +5,7 @@ import { Screen } from '@/components/ui/screen';
 import { RoutineEditor } from '@/components/workout/routine-editor';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
+import { confirmDestructive } from '@/utils/confirm';
 import type { CustomRoutineInput } from '@/utils/custom-routine';
 
 /** Creates a custom routine, or edits the one in the `id` param. */
@@ -34,6 +35,12 @@ export default function RoutineEditorScreen() {
 
   const handleDelete = async () => {
     if (!existing) return;
+    const confirmed = await confirmDestructive({
+      title: '¿Eliminar rutina?',
+      message: `«${existing.name}» se borrará de este dispositivo. Tu historial no cambia.`,
+      confirmLabel: 'Eliminar',
+    });
+    if (!confirmed) return;
     await deleteCustomRoutine(existing.id);
     router.dismissTo('/routines');
   };

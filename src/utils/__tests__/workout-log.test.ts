@@ -4,7 +4,11 @@ import {
   getLastWeightKg,
   getNextDayIndex,
   getStartOfWeek,
+  getWeekActivity,
+  getWeekStreak,
+  groupByMonth,
   isWorkoutLog,
+  summarizeWeek,
   summarizeWorkout,
 } from '@/utils/workout-log';
 
@@ -83,6 +87,63 @@ describe('weeks', () => {
     ];
 
     expect(countWorkoutsThisWeek(history, now)).toBe(2);
+  });
+
+  it('marks the days of the current week with a workout', () => {
+    const history = [
+      makeLog(new Date(2026, 9, 25, 9).toISOString()),
+      makeLog(new Date(2026, 9, 21, 9).toISOString()),
+      makeLog(new Date(2026, 9, 18, 20).toISOString()),
+    ];
+
+    expect(getWeekActivity(history, now)).toEqual([false, false, true, false, false, false, true]);
+  });
+
+  it('adds up the minutes and sets of the current week', () => {
+    const history = [
+      makeLog(new Date(2026, 9, 25, 9).toISOString()),
+      makeLog(new Date(2026, 9, 18, 20).toISOString()),
+    ];
+
+    expect(summarizeWeek(history, now)).toEqual({ minutes: 50, setCount: 2 });
+  });
+});
+
+describe('getWeekStreak', () => {
+  // Wednesday 21 October 2026, local time.
+  const now = new Date(2026, 9, 21, 12, 0);
+  const at = (month: number, day: number) => makeLog(new Date(2026, month, day, 9).toISOString());
+
+  it('counts the past weeks that reached the goal while the current one is unfinished', () => {
+    const history = [at(9, 20), at(9, 14), at(9, 12), at(9, 8), at(9, 6), at(8, 29)];
+
+    expect(getWeekStreak(history, 2, now)).toBe(2);
+  });
+
+  it('counts the current week once the goal is reached', () => {
+    const history = [at(9, 21), at(9, 19), at(9, 14), at(9, 12)];
+
+    expect(getWeekStreak(history, 2, now)).toBe(2);
+  });
+
+  it('is zero when last week missed the goal', () => {
+    expect(getWeekStreak([at(9, 14), at(9, 6), at(9, 5)], 2, now)).toBe(0);
+    expect(getWeekStreak([], 2, now)).toBe(0);
+  });
+});
+
+describe('groupByMonth', () => {
+  it('splits the history by month and keeps its order', () => {
+    const history = [
+      makeLog(new Date(2026, 9, 2, 9).toISOString()),
+      makeLog(new Date(2026, 9, 1, 9).toISOString()),
+      makeLog(new Date(2026, 8, 30, 9).toISOString()),
+    ];
+
+    const groups = groupByMonth(history);
+
+    expect(groups.map((group) => group.key)).toEqual(['2026-10', '2026-09']);
+    expect(groups[0].logs).toHaveLength(2);
   });
 });
 

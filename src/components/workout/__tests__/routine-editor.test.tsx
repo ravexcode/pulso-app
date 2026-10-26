@@ -61,6 +61,18 @@ describe('RoutineEditor', () => {
     expect(screen.queryByRole('button', { name: 'Añadir Press de banca' })).toBeNull();
   });
 
+  it('filters the catalog to exercises that can be done at home', async () => {
+    await render(<RoutineEditor onSave={jest.fn()} defaultDayCount={1} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Añadir ejercicios al día 1' }));
+    await fireEvent.press(screen.getByRole('tab', { name: 'En casa' }));
+
+    expect(screen.getByRole('button', { name: 'Añadir Fondos en silla' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Añadir Dominadas' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Añadir Sentadilla goblet' })).toBeNull();
+  });
+
+  // Every press re-renders the whole catalog, which is slow in Jest without the React Compiler.
   it('adds many exercises, repeats one on another day, sorts and saves the week', async () => {
     const onSave = jest.fn((_input: CustomRoutineInput) => Promise.resolve());
     await render(<RoutineEditor onSave={onSave} defaultDayCount={2} />);
@@ -108,7 +120,7 @@ describe('RoutineEditor', () => {
     // The squat keeps its two days, and multi-joint exercises go first.
     expect(input.days.filter((day) => day.exerciseIds.includes('squat'))).toHaveLength(2);
     expect(input.days[0].exerciseIds[0]).not.toBe('biceps-curl');
-  });
+  }, 30000);
 
   it('warns when a body part is trained on consecutive days', async () => {
     await render(

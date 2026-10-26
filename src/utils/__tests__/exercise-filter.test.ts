@@ -49,6 +49,17 @@ describe('body part filter', () => {
   });
 });
 
+describe('home filter', () => {
+  it('shows only bodyweight exercises that need home items at most', () => {
+    const home = filterExercises(EXERCISE_CATALOG, { equipment: [], query: '', homeOnly: true });
+    const ids = home.map((exercise) => exercise.id);
+
+    expect(ids).toEqual(expect.arrayContaining(['push-up', 'chair-dip', 'inverted-row']));
+    expect(ids).not.toContain('pull-up');
+    expect(ids).not.toContain('goblet-squat');
+  });
+});
+
 describe('getRequirements', () => {
   it('joins the requirements without repeats, in a stable order', () => {
     expect(getRequirements(['bench-press', 'squat', 'biceps-curl'])).toEqual([

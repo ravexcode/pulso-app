@@ -11,6 +11,17 @@ function normalize(text: string) {
     .trim();
 }
 
+/** Things most homes have. A pull-up bar is not one of them. */
+export const HOME_REQUIREMENTS: readonly Requirement[] = ['mat', 'chair', 'table'];
+
+/** Bodyweight exercise that needs nothing beyond `HOME_REQUIREMENTS`. */
+export function isHomeExercise(exercise: Exercise) {
+  return (
+    exercise.equipment === 'bodyweight' &&
+    exercise.requires.every((requirement) => HOME_REQUIREMENTS.includes(requirement))
+  );
+}
+
 export type ExerciseFilter = {
   /** Equipment to show. An empty list shows every exercise. */
   equipment: readonly Equipment[];
@@ -18,15 +29,18 @@ export type ExerciseFilter = {
   bodyParts?: readonly BodyPart[];
   /** Text to look for in the name or the muscles. */
   query: string;
+  /** Shows only exercises that can be done at home. */
+  homeOnly?: boolean;
 };
 
 export function filterExercises(
   exercises: readonly Exercise[],
-  { equipment, bodyParts = [], query }: ExerciseFilter
+  { equipment, bodyParts = [], query, homeOnly = false }: ExerciseFilter
 ): Exercise[] {
   const search = normalize(query);
   return exercises.filter(
     (exercise) =>
+      (!homeOnly || isHomeExercise(exercise)) &&
       (equipment.length === 0 || equipment.includes(exercise.equipment)) &&
       (bodyParts.length === 0 || bodyParts.includes(exercise.bodyPart)) &&
       (search === '' ||

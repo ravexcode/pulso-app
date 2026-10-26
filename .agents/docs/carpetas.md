@@ -19,6 +19,7 @@
 - `src/app/(tabs)/` — Pantallas dentro de la navegación principal por pestañas.
 - `src/components/` — Componentes compartidos de interfaz.
 - `src/components/__tests__/` — Pruebas de componentes compartidos.
+- `src/components/home/` — Componentes de la pantalla de inicio.
 - `src/components/intro/` — Componentes de introducción y onboarding.
 - `src/components/intro/__tests__/` — Pruebas de los componentes de onboarding.
 - `src/components/ui/` — Componentes UI básicos reutilizables.

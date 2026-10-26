@@ -58,6 +58,8 @@ export const REQUIREMENT_LABELS: Record<Requirement, string> = {
   cable: 'Polea',
   'pull-up-bar': 'Barra de dominadas',
   mat: 'Esterilla',
+  chair: 'Silla firme',
+  table: 'Mesa resistente',
 };
 
 /** Tag for exercises that need nothing. */

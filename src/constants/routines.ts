@@ -1,8 +1,11 @@
 /**
- * Full body plans. Each plan has a single day that trains the whole body and repeats on every
+ * Ready-made plans. Most have a single day that trains the whole body and repeats on every
  * training day, which the ACSM recommends for novice and intermediate lifters 2–3 days per
- * week. Exercises follow the ACSM order: large muscle groups and multi-joint exercises first,
- * small and single-joint ones last.
+ * week. The upper / lower plan alternates two days, as the ACSM suggests for 4 days per week.
+ * Exercises follow the ACSM order: large muscle groups and multi-joint exercises first, small
+ * and single-joint ones last.
+ *
+ * Home plans only use bodyweight exercises, with a chair, a table or a mat at most.
  */
 
 import type { Routine } from '@/types/workout';
@@ -86,6 +89,87 @@ export const ROUTINES: readonly Routine[] = [
           'glute-bridge',
           'superman',
           'plank',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'full-body-home-2',
+    name: 'Full Body en casa II',
+    description:
+      'Más difícil que el plan básico: trabajo a una pierna y remo bajo una mesa. Solo necesitas una silla, una mesa y una esterilla.',
+    place: 'home',
+    level: 'intermediate',
+    days: [
+      {
+        focus: [],
+        exerciseIds: [
+          'bulgarian-split-squat',
+          'decline-push-up',
+          'inverted-row',
+          'single-leg-rdl',
+          'chair-dip',
+          'single-leg-glute-bridge',
+          'side-plank',
+          'dead-bug',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'home-upper-lower',
+    name: 'Superior / Inferior en casa',
+    description:
+      'Dos días que se alternan: tren superior y tren inferior. Pensado para 4 días por semana en casa.',
+    place: 'home',
+    level: 'intermediate',
+    days: [
+      {
+        focus: ['chest', 'back', 'shoulders', 'biceps', 'triceps'],
+        exerciseIds: [
+          'decline-push-up',
+          'inverted-row',
+          'pike-push-up',
+          'underhand-inverted-row',
+          'chair-dip',
+          'prone-y-raise',
+          'reverse-snow-angel',
+        ],
+      },
+      {
+        focus: ['legs', 'glutes', 'core'],
+        exerciseIds: [
+          'bulgarian-split-squat',
+          'single-leg-rdl',
+          'step-up',
+          'lateral-lunge',
+          'single-leg-glute-bridge',
+          'calf-raise',
+          'hollow-hold',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'home-hiit-advanced',
+    name: 'Casa intenso',
+    description:
+      'Saltos, flexiones exigentes y core. Para quien ya domina los básicos y quiere subir el ritmo.',
+    place: 'home',
+    level: 'advanced',
+    days: [
+      {
+        focus: [],
+        exerciseIds: [
+          'jump-squat',
+          'burpee',
+          'bulgarian-split-squat',
+          'diamond-push-up',
+          'inverted-row',
+          'pike-push-up',
+          'mountain-climber',
+          'hollow-hold',
+          'plank-shoulder-tap',
         ],
       },
     ],

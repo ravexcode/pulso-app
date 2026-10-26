@@ -1,6 +1,8 @@
-import { EXERCISES } from '@/constants/exercises';
+import { EXERCISE_CATALOG, EXERCISES } from '@/constants/exercises';
 import { ROUTINES } from '@/constants/routines';
+import { BODY_PARTS } from '@/types/workout';
 import { getRoutineExerciseIds } from '@/utils/custom-routine';
+import { isHomeExercise } from '@/utils/exercise-filter';
 
 describe('routines', () => {
   it('has unique ids', () => {
@@ -19,12 +21,14 @@ describe('routines', () => {
   it.each(ROUTINES.map((routine) => [routine.name, routine] as const))(
     '%s puts compound exercises before isolation exercises',
     (_, routine) => {
-      const kinds = routine.days[0].exerciseIds.map((id) => EXERCISES[id].kind);
-      const firstIsolation = kinds.indexOf('isolation');
+      routine.days.forEach((day) => {
+        const kinds = day.exerciseIds.map((id) => EXERCISES[id].kind);
+        const firstIsolation = kinds.indexOf('isolation');
 
-      if (firstIsolation >= 0) {
-        expect(kinds.slice(firstIsolation)).not.toContain('compound');
-      }
+        if (firstIsolation >= 0) {
+          expect(kinds.slice(firstIsolation)).not.toContain('compound');
+        }
+      });
     }
   );
 
@@ -39,6 +43,10 @@ describe('routines', () => {
 
 describe('exercise catalog', () => {
   const exercises = Object.values(EXERCISES);
+
+  it('has unique ids', () => {
+    expect(exercises).toHaveLength(EXERCISE_CATALOG.length);
+  });
 
   it('lists the requirements of every equipment exercise', () => {
     exercises
@@ -60,5 +68,23 @@ describe('dumbbell back exercises', () => {
     );
 
     expect(backWithDumbbells.length).toBeGreaterThanOrEqual(6);
+  });
+});
+
+describe('home exercises', () => {
+  const homeExercises = EXERCISE_CATALOG.filter(isHomeExercise);
+
+  it.each(BODY_PARTS.map((part) => [part]))('trains %s with home exercises', (part) => {
+    expect(homeExercises.some((exercise) => exercise.bodyPart === part)).toBe(true);
+  });
+
+  it('offers at least 30 home exercises', () => {
+    expect(homeExercises.length).toBeGreaterThanOrEqual(30);
+  });
+
+  it('home routines only need things found at home', () => {
+    ROUTINES.filter((routine) => routine.place === 'home').forEach((routine) => {
+      getRoutineExerciseIds(routine).forEach((id) => expect(isHomeExercise(EXERCISES[id])).toBe(true));
+    });
   });
 });

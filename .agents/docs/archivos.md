@@ -89,8 +89,15 @@ Inventario de los archivos versionados del proyecto, incluidos los documentos de
 - `src/components/intro/intro-carousel.tsx` — Carrusel de pantallas de introducción.
 - `src/components/intro/intro-slide-view.tsx` — Presentación de una diapositiva de introducción.
 - `src/components/intro/page-indicator.tsx` — Indicador de página del carrusel.
-- `src/components/ui/button.tsx` — Componente de botón reutilizable.
+- `src/components/home/week-strip.tsx` — Tira de los siete días de la semana con los días entrenados.
+- `src/components/ui/button.tsx` — Botón reutilizable (primario, gris o plano) con icono opcional.
+- `src/components/ui/icon.tsx` — Icono SF Symbols en iOS y Material Symbols en Android y web.
+- `src/components/ui/list.tsx` — Lista agrupada al estilo iOS (`ListSection` y `ListRow`).
+- `src/components/ui/progress-bar.tsx` — Barra de progreso accesible.
+- `src/components/ui/segmented-control.tsx` — Control segmentado al estilo iOS.
+- `src/components/ui/stat-tile.tsx` — Recuadro con una cifra y su etiqueta.
 - `src/components/ui/collapsible.tsx` — Componente de contenido expandible/colapsable.
+- `src/constants/icons.ts` — Iconos compartidos por pantallas, lugares, equipos y esfuerzos.
 - `src/constants/intro-slides.ts` — Contenido y datos de las diapositivas de onboarding.
 - `src/constants/palette.js` — Paleta de colores compartida por la aplicación.
 - `src/constants/theme.ts` — Tokens y acceso tipado a colores del tema.
@@ -103,6 +110,7 @@ Inventario de los archivos versionados del proyecto, incluidos los documentos de
 - `src/storage/user-storage.ts` — Persistencia local de los datos del usuario.
 - `src/styles.d.ts` — Declaraciones de tipos para estilos/CSS.
 - `src/types/user.ts` — Tipos TypeScript del perfil de usuario.
+- `src/utils/confirm.ts` — Diálogo de confirmación para acciones destructivas.
 - `src/utils/user-profile.ts` — Utilidades para crear y manejar perfiles de usuario.
 
 ## Pruebas

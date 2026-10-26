@@ -120,3 +120,79 @@ export function getNextDayIndex(history: readonly WorkoutLog[], routine: Routine
   }
   return 0;
 }
+
+/**
+ * Days of the current week (Monday first) with at least one workout, to draw the week strip.
+ */
+export function getWeekActivity(history: readonly WorkoutLog[], now = new Date()): boolean[] {
+  const start = getStartOfWeek(now);
+  const days = Array.from({ length: 7 }, () => false);
+  for (const log of history) {
+    const date = new Date(log.startedAt);
+    if (date < start) continue;
+    const index = (date.getDay() + 6) % 7;
+    days[index] = true;
+  }
+  return days;
+}
+
+/**
+ * Weeks in a row in which the user reached the weekly goal. The current week only counts once
+ * the goal is reached, so an unfinished week does not break the streak.
+ */
+export function getWeekStreak(
+  history: readonly WorkoutLog[],
+  weeklyGoal: number,
+  now = new Date()
+): number {
+  if (weeklyGoal <= 0) return 0;
+  const counts = new Map<number, number>();
+  for (const log of history) {
+    const week = getStartOfWeek(new Date(log.startedAt)).getTime();
+    counts.set(week, (counts.get(week) ?? 0) + 1);
+  }
+
+  const week = getStartOfWeek(now);
+  let streak = (counts.get(week.getTime()) ?? 0) >= weeklyGoal ? 1 : 0;
+  for (;;) {
+    week.setDate(week.getDate() - 7);
+    if ((counts.get(week.getTime()) ?? 0) < weeklyGoal) return streak;
+    streak++;
+  }
+}
+
+/** Minutes and sets trained since Monday. */
+export function summarizeWeek(history: readonly WorkoutLog[], now = new Date()) {
+  const start = getStartOfWeek(now).getTime();
+  return history
+    .filter((log) => Date.parse(log.startedAt) >= start)
+    .reduce(
+      (total, log) => ({
+        minutes: total.minutes + Math.round(log.durationSec / 60),
+        setCount: total.setCount + log.sets.length,
+      }),
+      { minutes: 0, setCount: 0 }
+    );
+}
+
+export type MonthGroup = {
+  /** `YYYY-MM`, in local time. */
+  key: string;
+  logs: WorkoutLog[];
+};
+
+/** Splits the history by month, keeping its order (newest first). */
+export function groupByMonth(history: readonly WorkoutLog[]): MonthGroup[] {
+  const groups: MonthGroup[] = [];
+  for (const log of history) {
+    const date = new Date(log.startedAt);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const last = groups.at(-1);
+    if (last?.key === key) {
+      last.logs.push(log);
+    } else {
+      groups.push({ key, logs: [log] });
+    }
+  }
+  return groups;
+}

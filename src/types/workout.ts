@@ -40,7 +40,9 @@ export type Requirement =
   | 'leg-extension'
   | 'cable'
   | 'pull-up-bar'
-  | 'mat';
+  | 'mat'
+  | 'chair'
+  | 'table';
 
 export type Exercise = {
   id: string;

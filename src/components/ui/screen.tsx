@@ -9,6 +9,8 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 type ScreenProps = {
   title?: string;
   subtitle?: string;
+  /** Small text above the title, like today's date in Apple Fitness. */
+  eyebrow?: string;
   children: ReactNode;
   /** Adds space for the bottom tab bar. */
   hasTabBar?: boolean;
@@ -20,6 +22,7 @@ type ScreenProps = {
 export function Screen({
   title,
   subtitle,
+  eyebrow,
   children,
   hasTabBar = false,
   hasHeader = false,
@@ -34,10 +37,20 @@ export function Screen({
           paddingBottom: (hasTabBar ? BottomTabInset : 0) + Spacing.five,
           alignItems: 'center',
         }}>
-        <View className="w-full gap-6 px-6 pt-6" style={{ maxWidth: MaxContentWidth }}>
+        <View
+          className={`w-full gap-6 px-5 ${hasHeader ? 'pt-2' : 'pt-4'}`}
+          style={{ maxWidth: MaxContentWidth }}>
           {title && (
             <View className="gap-1">
-              <Text accessibilityRole="header" className="text-3xl font-bold text-foreground">
+              {eyebrow && (
+                <Text className="text-[13px] font-semibold uppercase tracking-wide text-foreground-subtle">
+                  {eyebrow}
+                </Text>
+              )}
+              {/* iOS large title: 34 pt bold. */}
+              <Text
+                accessibilityRole="header"
+                className="text-[34px] font-bold leading-[41px] tracking-tight text-foreground">
                 {title}
               </Text>
               {subtitle && <Text className="text-base text-foreground-muted">{subtitle}</Text>}
@@ -52,5 +65,5 @@ export function Screen({
 
 /** Elevated surface for grouped content. */
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <View className={`gap-3 rounded-3xl bg-background-600 p-5 ${className}`}>{children}</View>;
+  return <View className={`gap-3 rounded-2xl bg-background-600 p-4 ${className}`}>{children}</View>;
 }

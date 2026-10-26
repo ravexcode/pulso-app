@@ -3,12 +3,14 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
+import { Icon, type IconName } from '@/components/ui/icon';
 import { Card } from '@/components/ui/screen';
 import { TextField } from '@/components/ui/text-field';
 import { BodyPartPalette, type DragPoint } from '@/components/workout/body-part-palette';
 import { ExercisePicker } from '@/components/workout/exercise-picker';
 import { RequirementTags } from '@/components/workout/requirement-tags';
 import { getExercise } from '@/constants/exercises';
+import { EQUIPMENT_ICONS, ICONS } from '@/constants/icons';
 import { BODY_PART_LABELS } from '@/constants/labels';
 import type { BodyPart, RoutineDay } from '@/types/workout';
 import {
@@ -43,14 +45,15 @@ type RoutineEditorProps = {
 type Rect = { x: number; y: number; width: number; height: number };
 type ViewRef = ComponentRef<typeof View>;
 
+/** Round 44 pt button with only an icon. `label` is read by screen readers. */
 function IconButton({
   label,
-  symbol,
+  icon,
   disabled,
   onPress,
 }: {
   label: string;
-  symbol: string;
+  icon: IconName;
   disabled?: boolean;
   onPress: () => void;
 }) {
@@ -61,8 +64,8 @@ function IconButton({
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      className={`h-9 w-9 items-center justify-center rounded-full border border-accent-800 active:opacity-70 ${disabled ? 'opacity-30' : ''}`}>
-      <Text className="text-base font-bold text-foreground">{symbol}</Text>
+      className={`h-11 w-11 items-center justify-center rounded-full bg-background-300 active:opacity-70 ${disabled ? 'opacity-30' : ''}`}>
+      <Icon name={icon} size="small" />
     </Pressable>
   );
 }
@@ -158,7 +161,7 @@ export function RoutineEditor({
         <View className="flex-row items-center gap-4">
           <IconButton
             label="Quitar un día"
-            symbol="−"
+            icon={ICONS.remove}
             disabled={days.length <= CUSTOM_ROUTINE_LIMITS.minDays}
             onPress={() => changeDayCount(days.length - 1)}
           />
@@ -169,7 +172,7 @@ export function RoutineEditor({
           </Text>
           <IconButton
             label="Añadir un día"
-            symbol="+"
+            icon={ICONS.add}
             disabled={days.length >= CUSTOM_ROUTINE_LIMITS.maxDays}
             onPress={() => changeDayCount(days.length + 1)}
           />
@@ -191,6 +194,7 @@ export function RoutineEditor({
         </Text>
         <Button
           title="Ordenar automáticamente"
+          icon={ICONS.sparkles}
           disabled={exerciseCount === 0}
           onPress={() => setDays(autoSortWeek)}
         />
@@ -222,7 +226,7 @@ export function RoutineEditor({
               dayViews.current[dayIndex] = view;
             }}
             collapsable={false}
-            className={`gap-4 rounded-3xl border p-4 ${hoveredDay === dayIndex ? 'border-accent bg-background-500' : 'border-background-300 bg-background-700'}`}>
+            className={`gap-4 rounded-2xl border p-4 ${hoveredDay === dayIndex ? 'border-accent bg-background-500' : 'border-background-400 bg-background-700'}`}>
             <View className="flex-row items-center justify-between gap-3">
               <Text accessibilityRole="header" className="text-xl font-bold text-foreground">
                 Día {dayNumber}
@@ -245,7 +249,8 @@ export function RoutineEditor({
                 {day.focus.map((part) => (
                   <Chip
                     key={part}
-                    label={`${BODY_PART_LABELS[part]} ✕`}
+                    label={BODY_PART_LABELS[part]}
+                    trailingIcon={ICONS.close}
                     accessibilityLabel={`Quitar ${BODY_PART_LABELS[part]} del foco del día ${dayNumber}`}
                     selected
                     onPress={() => setDays((current) => removeFocus(current, dayIndex, part))}
@@ -271,8 +276,11 @@ export function RoutineEditor({
               const repeatKey = `${dayIndex}:${id}`;
               const repeatDays = getExerciseDays(days, id);
               return (
-                <View key={id} className="gap-3 rounded-3xl bg-background-500 p-4">
+                <View key={id} className="gap-3 rounded-2xl bg-background-500 p-3">
                   <View className="flex-row items-center gap-2">
+                    <View className="h-9 w-9 items-center justify-center rounded-xl bg-background-300">
+                      <Icon name={EQUIPMENT_ICONS[exercise.equipment]} size="small" />
+                    </View>
                     <View className="flex-1">
                       <Text className="text-base font-semibold text-foreground" numberOfLines={2}>
                         {exercise.name}
@@ -284,7 +292,7 @@ export function RoutineEditor({
                     </View>
                     <IconButton
                       label={`Subir ${exercise.name} en el día ${dayNumber}`}
-                      symbol="↑"
+                      icon={ICONS.moveUp}
                       disabled={position === 0}
                       onPress={() =>
                         setDays((current) => moveExercise(current, dayIndex, position, -1))
@@ -292,7 +300,7 @@ export function RoutineEditor({
                     />
                     <IconButton
                       label={`Bajar ${exercise.name} en el día ${dayNumber}`}
-                      symbol="↓"
+                      icon={ICONS.moveDown}
                       disabled={position === day.exerciseIds.length - 1}
                       onPress={() =>
                         setDays((current) => moveExercise(current, dayIndex, position, 1))
@@ -300,7 +308,7 @@ export function RoutineEditor({
                     />
                     <IconButton
                       label={`Quitar ${exercise.name} del día ${dayNumber}`}
-                      symbol="✕"
+                      icon={ICONS.close}
                       onPress={() => setDays((current) => toggleExercise(current, dayIndex, id))}
                     />
                   </View>
@@ -308,6 +316,7 @@ export function RoutineEditor({
                   {days.length > 1 && (
                     <Button
                       title={repeatOpen === repeatKey ? 'Listo' : 'Repetir en otros días'}
+                      icon={repeatOpen === repeatKey ? ICONS.check : ICONS.repeat}
                       accessibilityLabel={`Repetir ${exercise.name} en otros días`}
                       variant="secondary"
                       size="small"
@@ -336,14 +345,20 @@ export function RoutineEditor({
             })}
 
             {dayWarnings.map((warning) => (
-              <Text key={warning.previousDayIndex} className="text-sm text-foreground">
-                {partsLabel(warning.parts)} también se entrena el día {warning.previousDayIndex + 1}
-                . Deja unas 48 h entre sesiones del mismo grupo.
-              </Text>
+              <View
+                key={warning.previousDayIndex}
+                className="flex-row items-start gap-2 rounded-xl bg-background-500 p-3">
+                <Icon name={ICONS.warning} size="small" />
+                <Text className="flex-1 text-sm text-foreground">
+                  {partsLabel(warning.parts)} también se entrena el día{' '}
+                  {warning.previousDayIndex + 1}. Deja unas 48 h entre sesiones del mismo grupo.
+                </Text>
+              </View>
             ))}
 
             <Button
               title={pickerDay === dayIndex ? 'Cerrar catálogo' : 'Añadir ejercicios'}
+              icon={pickerDay === dayIndex ? ICONS.close : ICONS.add}
               accessibilityLabel={
                 pickerDay === dayIndex
                   ? `Cerrar catálogo del día ${dayNumber}`
@@ -377,11 +392,12 @@ export function RoutineEditor({
       )}
 
       <View className="gap-2">
-        <Button title="Guardar rutina" onPress={handleSave} disabled={isSaving} />
+        <Button title="Guardar rutina" icon={ICONS.check} onPress={handleSave} disabled={isSaving} />
         {onDelete && (
           <Button
             title="Eliminar rutina"
-            variant="secondary"
+            icon={ICONS.trash}
+            variant="plain"
             onPress={() => void run(onDelete)}
             disabled={isSaving}
           />

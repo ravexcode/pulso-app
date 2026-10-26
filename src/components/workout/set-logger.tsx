@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { TextField } from '@/components/ui/text-field';
 import { usesWeight } from '@/constants/exercises';
+import { EFFORT_ICONS, ICONS } from '@/constants/icons';
 import { EFFORT_LABELS } from '@/constants/labels';
+import { Colors } from '@/constants/theme';
 import type { Units } from '@/types/user';
 import { EFFORTS, type Effort, type Exercise, type SetTarget } from '@/types/workout';
 import {
@@ -76,9 +79,12 @@ export function SetLogger({
 
   return (
     <View className="gap-5">
-      <Text className="text-base text-foreground-muted">
-        Duración de la serie: {formatDuration(workSec)}
-      </Text>
+      <View className="flex-row items-center gap-2">
+        <Icon name={ICONS.timer} size="small" color={Colors.dark.textSecondary} />
+        <Text className="text-base text-foreground-muted">
+          Duración de la serie: {formatDuration(workSec)}
+        </Text>
+      </View>
 
       {(tracksReps || hasWeight) && (
         <View className="flex-row gap-3">
@@ -122,30 +128,44 @@ export function SetLogger({
 
       <View className="gap-2">
         <Text className="text-sm font-semibold text-foreground-muted">¿Cómo se sintió?</Text>
-        {EFFORTS.map((option) => {
-          const selected = option === effort;
-          return (
-            <Pressable
-              key={option}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              accessibilityLabel={EFFORT_LABELS[option].title}
-              onPress={() => setEffort(option)}
-              className={`rounded-full px-5 py-3 active:opacity-70 ${selected ? 'bg-accent' : 'border border-accent-800'}`}>
-              <Text
-                className={`text-base font-semibold ${selected ? 'text-foreground-inverse' : 'text-foreground'}`}>
-                {EFFORT_LABELS[option].title}
-              </Text>
-              <Text
-                className={`text-sm ${selected ? 'text-foreground-inverse' : 'text-foreground-subtle'}`}>
-                {EFFORT_LABELS[option].hint}
-              </Text>
-            </Pressable>
-          );
-        })}
+        <View className="overflow-hidden rounded-2xl bg-background-600">
+          {EFFORTS.map((option, index) => {
+            const selected = option === effort;
+            return (
+              <View key={option}>
+                {index > 0 && <View className="ml-16 h-px bg-background-300" />}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={EFFORT_LABELS[option].title}
+                  accessibilityHint={EFFORT_LABELS[option].hint}
+                  onPress={() => setEffort(option)}
+                  className={`min-h-14 flex-row items-center gap-3 px-4 py-3 active:bg-background-500 ${selected ? 'bg-background-400' : ''}`}>
+                  <View
+                    className={`h-9 w-9 items-center justify-center rounded-xl ${selected ? 'bg-accent' : 'bg-background-400'}`}>
+                    <Icon
+                      name={EFFORT_ICONS[option]}
+                      size="small"
+                      color={selected ? Colors.dark.textOnAccent : Colors.dark.text}
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-foreground">
+                      {EFFORT_LABELS[option].title}
+                    </Text>
+                    <Text className="text-sm text-foreground-subtle">
+                      {EFFORT_LABELS[option].hint}
+                    </Text>
+                  </View>
+                  {selected && <Icon name={ICONS.checkCircle} />}
+                </Pressable>
+              </View>
+            );
+          })}
+        </View>
       </View>
 
-      <Button title="Guardar serie" onPress={handleSave} disabled={!canSave} />
+      <Button title="Guardar serie" icon={ICONS.check} onPress={handleSave} disabled={!canSave} />
     </View>
   );
 }
