@@ -1,13 +1,28 @@
 import { EXERCISES, getExercise } from '@/constants/exercises';
 import { ROUTINES } from '@/constants/routines';
-import type { CustomRoutine, Routine } from '@/types/workout';
+import { BODY_PARTS, type CustomRoutine, type Routine, type RoutineDay } from '@/types/workout';
 
 export const CUSTOM_ROUTINE_LIMITS = {
   nameMaxLength: 40,
-  maxExercises: 12,
+  minDays: 1,
+  maxDays: 7,
 } as const;
 
-export type CustomRoutineInput = Pick<CustomRoutine, 'name' | 'exerciseIds'>;
+export type CustomRoutineInput = Pick<CustomRoutine, 'name' | 'days'>;
+
+function isRoutineDay(value: unknown): value is RoutineDay {
+  if (typeof value !== 'object' || value === null) return false;
+  const { focus, exerciseIds } = value as Record<string, unknown>;
+  return (
+    Array.isArray(focus) &&
+    focus.every((part) => (BODY_PARTS as readonly unknown[]).includes(part)) &&
+    new Set(focus).size === focus.length &&
+    Array.isArray(exerciseIds) &&
+    exerciseIds.every((id) => typeof id === 'string' && id in EXERCISES) &&
+    // An exercise may repeat on other days, but only once per day.
+    new Set(exerciseIds).size === exerciseIds.length
+  );
+}
 
 /** Returns the names of the invalid fields. An empty list means the input is valid. */
 export function validateCustomRoutineInput(input: Record<string, unknown>) {
@@ -15,31 +30,50 @@ export function validateCustomRoutineInput(input: Record<string, unknown>) {
   const name = typeof input.name === 'string' ? input.name.trim() : '';
   if (name.length === 0 || name.length > CUSTOM_ROUTINE_LIMITS.nameMaxLength) errors.push('name');
 
-  const ids = input.exerciseIds;
+  const { days } = input;
   if (
-    !Array.isArray(ids) ||
-    ids.length === 0 ||
-    ids.length > CUSTOM_ROUTINE_LIMITS.maxExercises ||
-    new Set(ids).size !== ids.length ||
-    !ids.every((id) => typeof id === 'string' && id in EXERCISES)
+    !Array.isArray(days) ||
+    days.length < CUSTOM_ROUTINE_LIMITS.minDays ||
+    days.length > CUSTOM_ROUTINE_LIMITS.maxDays ||
+    !days.every(isRoutineDay) ||
+    !days.some((day) => day.exerciseIds.length > 0)
   ) {
-    errors.push('exerciseIds');
+    errors.push('days');
   }
   return errors;
 }
 
-/** Checks data read from disk, which may be outdated or corrupted. */
-export function isCustomRoutine(value: unknown): value is CustomRoutine {
-  if (typeof value !== 'object' || value === null) return false;
+function isTimestamp(value: unknown): value is string {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value));
+}
+
+/**
+ * Reads a routine from disk, which may be outdated or corrupted. Routines saved before week
+ * plans had a single `exerciseIds` list; they become a one-day plan. Returns `null` when the
+ * data is not valid.
+ */
+export function parseCustomRoutine(value: unknown): CustomRoutine | null {
+  if (typeof value !== 'object' || value === null) return null;
   const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    validateCustomRoutineInput(record).length === 0 &&
-    typeof record.createdAt === 'string' &&
-    !Number.isNaN(Date.parse(record.createdAt)) &&
-    typeof record.updatedAt === 'string' &&
-    !Number.isNaN(Date.parse(record.updatedAt))
-  );
+  const days = Array.isArray(record.exerciseIds)
+    ? [{ focus: [], exerciseIds: record.exerciseIds }]
+    : record.days;
+  const routine = { ...record, days };
+  if (
+    typeof record.id !== 'string' ||
+    validateCustomRoutineInput(routine).length > 0 ||
+    !isTimestamp(record.createdAt) ||
+    !isTimestamp(record.updatedAt)
+  ) {
+    return null;
+  }
+  return {
+    id: record.id,
+    name: (record.name as string).trim(),
+    days: days as RoutineDay[],
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
 }
 
 export class InvalidCustomRoutineError extends Error {
@@ -47,6 +81,10 @@ export class InvalidCustomRoutineError extends Error {
     super(`Invalid custom routine fields: ${fields.join(', ')}`);
     this.name = 'InvalidCustomRoutineError';
   }
+}
+
+function copyDays(days: readonly RoutineDay[]): RoutineDay[] {
+  return days.map((day) => ({ focus: [...day.focus], exerciseIds: [...day.exerciseIds] }));
 }
 
 export function createCustomRoutine(input: CustomRoutineInput, now = new Date()): CustomRoutine {
@@ -58,7 +96,7 @@ export function createCustomRoutine(input: CustomRoutineInput, now = new Date())
   return {
     id: `custom-${now.getTime()}`,
     name: input.name.trim(),
-    exerciseIds: [...input.exerciseIds],
+    days: copyDays(input.days),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -76,7 +114,7 @@ export function updateCustomRoutine(
   return {
     ...routine,
     name: input.name.trim(),
-    exerciseIds: [...input.exerciseIds],
+    days: copyDays(input.days),
     updatedAt: now.toISOString(),
   };
 }
@@ -91,17 +129,21 @@ export function sortByGuidelines(exerciseIds: readonly string[]): string[] {
   return [...compound, ...isolation];
 }
 
+/** Every exercise of the routine, once, in the order it first appears. */
+export function getRoutineExerciseIds(routine: Pick<Routine, 'days'>): string[] {
+  return [...new Set(routine.days.flatMap((day) => day.exerciseIds))];
+}
+
 export function toRoutine(custom: CustomRoutine): Routine {
-  const count = custom.exerciseIds.length;
+  const dayCount = custom.days.length;
+  const ids = getRoutineExerciseIds(custom);
   return {
     id: custom.id,
     name: custom.name,
-    description: `${count} ${count === 1 ? 'ejercicio elegido' : 'ejercicios elegidos'} por ti.`,
-    place: custom.exerciseIds.every((id) => getExercise(id).equipment === 'bodyweight')
-      ? 'home'
-      : 'gym',
+    description: `${dayCount} ${dayCount === 1 ? 'día' : 'días'} por semana, con ejercicios elegidos por ti.`,
+    place: ids.every((id) => getExercise(id).equipment === 'bodyweight') ? 'home' : 'gym',
     isCustom: true,
-    exerciseIds: custom.exerciseIds,
+    days: custom.days,
   };
 }
 

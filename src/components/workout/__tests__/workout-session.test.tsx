@@ -10,11 +10,11 @@ const routine: Routine = {
   description: '',
   place: 'gym',
   level: 'beginner',
-  exerciseIds: ['squat'],
+  days: [{ focus: [], exerciseIds: ['squat'] }],
 };
 
 // Beginner + build-muscle: squat 2 × 8–12, base rest 120 s.
-const plan = planRoutine(routine, 'build-muscle', 'beginner');
+const plan = planRoutine(routine, 0, 'build-muscle', 'beginner');
 
 async function advance(ms: number) {
   await act(async () => {
@@ -37,6 +37,7 @@ describe('WorkoutSession', () => {
     await render(
       <WorkoutSession
         routine={routine}
+        dayIndex={0}
         plan={plan}
         units="metric"
         history={[]}
@@ -86,6 +87,7 @@ describe('WorkoutSession', () => {
     await render(
       <WorkoutSession
         routine={routine}
+        dayIndex={0}
         plan={plan}
         units="metric"
         history={[]}
@@ -106,6 +108,7 @@ describe('WorkoutSession', () => {
     await render(
       <WorkoutSession
         routine={routine}
+        dayIndex={0}
         plan={plan}
         units="metric"
         history={[]}

@@ -1,4 +1,4 @@
-import { EFFORTS, type LoggedSet, type WorkoutLog } from '@/types/workout';
+import { EFFORTS, type LoggedSet, type Routine, type WorkoutLog } from '@/types/workout';
 
 function isNonNegativeNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0;
@@ -28,6 +28,17 @@ function isLoggedSet(value: unknown): value is LoggedSet {
   );
 }
 
+function isLogDay(value: unknown) {
+  if (typeof value !== 'object' || value === null) return false;
+  const { index, count } = value as Record<string, unknown>;
+  return (
+    Number.isInteger(index) &&
+    Number.isInteger(count) &&
+    (index as number) >= 0 &&
+    (index as number) < (count as number)
+  );
+}
+
 /** Checks data read from disk, which may be outdated or corrupted. */
 export function isWorkoutLog(value: unknown): value is WorkoutLog {
   if (typeof value !== 'object' || value === null) return false;
@@ -36,6 +47,7 @@ export function isWorkoutLog(value: unknown): value is WorkoutLog {
     typeof log.id === 'string' &&
     typeof log.routineId === 'string' &&
     typeof log.routineName === 'string' &&
+    (log.day === undefined || isLogDay(log.day)) &&
     isTimestamp(log.startedAt) &&
     isTimestamp(log.endedAt) &&
     isNonNegativeNumber(log.durationSec) &&
@@ -92,4 +104,19 @@ export function getLastWeightKg(history: readonly WorkoutLog[], exerciseId: stri
     }
   }
   return undefined;
+}
+
+/**
+ * Day of the routine to train next: the first day with exercises after the last trained day of
+ * this routine, or the first day with exercises. `history` is sorted from newest to oldest.
+ */
+export function getNextDayIndex(history: readonly WorkoutLog[], routine: Routine): number {
+  const count = routine.days.length;
+  const last = history.find((log) => log.routineId === routine.id && log.day !== undefined);
+  const start = last?.day && last.day.count === count ? last.day.index + 1 : 0;
+  for (let step = 0; step < count; step++) {
+    const index = (start + step) % count;
+    if (routine.days[index].exerciseIds.length > 0) return index;
+  }
+  return 0;
 }

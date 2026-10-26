@@ -1,6 +1,6 @@
 import { getExercise } from '@/constants/exercises';
 import { REQUIREMENT_LABELS } from '@/constants/labels';
-import type { Equipment, Exercise, Requirement } from '@/types/workout';
+import type { BodyPart, Equipment, Exercise, Requirement } from '@/types/workout';
 
 /** Lowercase and without accents, so "jalon" finds "Jalón". */
 function normalize(text: string) {
@@ -14,18 +14,21 @@ function normalize(text: string) {
 export type ExerciseFilter = {
   /** Equipment to show. An empty list shows every exercise. */
   equipment: readonly Equipment[];
+  /** Body parts to show. An empty list shows every body part. */
+  bodyParts?: readonly BodyPart[];
   /** Text to look for in the name or the muscles. */
   query: string;
 };
 
 export function filterExercises(
   exercises: readonly Exercise[],
-  { equipment, query }: ExerciseFilter
+  { equipment, bodyParts = [], query }: ExerciseFilter
 ): Exercise[] {
   const search = normalize(query);
   return exercises.filter(
     (exercise) =>
       (equipment.length === 0 || equipment.includes(exercise.equipment)) &&
+      (bodyParts.length === 0 || bodyParts.includes(exercise.bodyPart)) &&
       (search === '' ||
         normalize(exercise.name).includes(search) ||
         normalize(exercise.muscles).includes(search))

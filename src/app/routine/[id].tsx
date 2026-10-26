@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, Screen } from '@/components/ui/screen';
 import { RequirementTags } from '@/components/workout/requirement-tags';
 import { getExercise } from '@/constants/exercises';
-import { GOAL_LABELS, LEVEL_LABELS, PLACE_LABELS } from '@/constants/labels';
+import { BODY_PART_LABELS, GOAL_LABELS, LEVEL_LABELS, PLACE_LABELS } from '@/constants/labels';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
 import type { Prescription } from '@/types/workout';
-import { findRoutine } from '@/utils/custom-routine';
+import { findRoutine, getRoutineExerciseIds } from '@/utils/custom-routine';
 import { getRequirements } from '@/utils/exercise-filter';
 import { formatRest } from '@/utils/format';
-import { estimateRoutineMinutes, getPrescription } from '@/utils/prescription';
+import { estimateDayMinutes, getPrescription } from '@/utils/prescription';
+import { getNextDayIndex } from '@/utils/workout-log';
 
 function describeTarget({ sets, target }: Prescription) {
   return target.kind === 'time'
@@ -24,36 +25,41 @@ export default function RoutineDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useUser();
-  const { activeRoutineId, customRoutines, selectRoutine } = useTraining();
+  const { activeRoutineId, customRoutines, history, selectRoutine } = useTraining();
   const routine = findRoutine(id, customRoutines);
 
   if (!user) return null;
   if (!routine) {
     return (
-      <Screen title="Rutina no encontrada">
+      <Screen title="Rutina no encontrada" hasHeader>
         <Button title="Volver" variant="secondary" onPress={() => router.back()} />
       </Screen>
     );
   }
 
   const isActive = routine.id === activeRoutineId;
-  const minutes = estimateRoutineMinutes(routine, user.goal, user.level);
+  const isWeekPlan = routine.days.length > 1;
+  const nextDay = getNextDayIndex(history, routine);
 
-  const startWorkout = async () => {
+  const startWorkout = async (dayIndex: number) => {
     if (!isActive) await selectRoutine(routine.id);
-    router.push({ pathname: '/workout/[routineId]', params: { routineId: routine.id } });
+    router.push({
+      pathname: '/workout/[routineId]',
+      params: { routineId: routine.id, day: String(dayIndex) },
+    });
   };
 
   return (
     <Screen title={routine.name} subtitle={routine.description} hasHeader>
       <Text className="text-sm text-foreground-subtle">
         {routine.isCustom ? 'Personalizada' : LEVEL_LABELS[routine.level ?? user.level]} ·{' '}
-        {PLACE_LABELS[routine.place]} · ~{minutes} min
+        {PLACE_LABELS[routine.place]}
+        {isWeekPlan ? ` · ${routine.days.length} días por semana` : ' · Se repite cada día'}
       </Text>
 
       <View className="gap-2">
         <Text className="text-sm font-semibold text-foreground-muted">Necesitas</Text>
-        <RequirementTags requirements={getRequirements(routine.exerciseIds)} />
+        <RequirementTags requirements={getRequirements(getRoutineExerciseIds(routine))} />
       </View>
 
       <Card>
@@ -63,32 +69,61 @@ export default function RoutineDetailScreen() {
         </Text>
       </Card>
 
-      <View className="gap-3">
-        {routine.exerciseIds.map((exerciseId, index) => {
-          const exercise = getExercise(exerciseId);
-          const prescription = getPrescription(exercise, user.goal, user.level);
-          return (
-            <Card key={exerciseId}>
-              <View className="flex-row items-center gap-3">
-                <View className="h-9 w-9 items-center justify-center rounded-full bg-background-400">
-                  <Text className="text-sm font-bold text-foreground">{index + 1}</Text>
-                </View>
-                <View className="flex-1">
-                  <Text className="text-base font-semibold text-foreground">{exercise.name}</Text>
-                  <Text className="text-sm text-foreground-subtle">{exercise.muscles}</Text>
-                </View>
-              </View>
-              <Text className="text-sm text-foreground-muted">
-                {describeTarget(prescription)} · Descanso {formatRest(prescription.rest.base)}
+      {routine.days.map((day, dayIndex) => (
+        <View key={dayIndex} className="gap-3">
+          {isWeekPlan && (
+            <View className="gap-1">
+              <Text accessibilityRole="header" className="text-xl font-bold text-foreground">
+                Día {dayIndex + 1}
+                {dayIndex === nextDay && day.exerciseIds.length > 0 ? ' · Siguiente' : ''}
               </Text>
-              <RequirementTags requirements={exercise.requires} />
-            </Card>
-          );
-        })}
-      </View>
+              <Text className="text-sm text-foreground-subtle">
+                {day.focus.length > 0
+                  ? `Foco: ${day.focus.map((part) => BODY_PART_LABELS[part]).join(', ')}`
+                  : 'Sin foco'}
+                {day.exerciseIds.length > 0 &&
+                  ` · ~${estimateDayMinutes(day.exerciseIds, user.goal, user.level)} min`}
+              </Text>
+            </View>
+          )}
+
+          {day.exerciseIds.length === 0 && (
+            <Text className="text-base text-foreground-muted">Día de descanso: sin ejercicios.</Text>
+          )}
+
+          {day.exerciseIds.map((exerciseId, index) => {
+            const exercise = getExercise(exerciseId);
+            const prescription = getPrescription(exercise, user.goal, user.level);
+            return (
+              <Card key={exerciseId}>
+                <View className="flex-row items-center gap-3">
+                  <View className="h-9 w-9 items-center justify-center rounded-full bg-background-400">
+                    <Text className="text-sm font-bold text-foreground">{index + 1}</Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-foreground">{exercise.name}</Text>
+                    <Text className="text-sm text-foreground-subtle">{exercise.muscles}</Text>
+                  </View>
+                </View>
+                <Text className="text-sm text-foreground-muted">
+                  {describeTarget(prescription)} · Descanso {formatRest(prescription.rest.base)}
+                </Text>
+                <RequirementTags requirements={exercise.requires} />
+              </Card>
+            );
+          })}
+
+          {day.exerciseIds.length > 0 && (
+            <Button
+              title={isWeekPlan ? `Empezar día ${dayIndex + 1}` : 'Empezar entrenamiento'}
+              variant={dayIndex === nextDay ? 'primary' : 'secondary'}
+              onPress={() => void startWorkout(dayIndex)}
+            />
+          )}
+        </View>
+      ))}
 
       <View className="gap-3">
-        <Button title="Empezar entrenamiento" onPress={() => void startWorkout()} />
         <Button
           title={isActive ? 'Es tu rutina activa' : 'Usar esta rutina'}
           variant="secondary"

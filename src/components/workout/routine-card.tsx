@@ -4,6 +4,7 @@ import { RequirementTags } from '@/components/workout/requirement-tags';
 import { LEVEL_LABELS, PLACE_LABELS } from '@/constants/labels';
 import type { Goal, Level } from '@/types/user';
 import type { Routine } from '@/types/workout';
+import { getRoutineExerciseIds } from '@/utils/custom-routine';
 import { getRequirements } from '@/utils/exercise-filter';
 import { estimateRoutineMinutes } from '@/utils/prescription';
 
@@ -36,6 +37,8 @@ export function RoutineCard({
   onPress,
 }: RoutineCardProps) {
   const minutes = estimateRoutineMinutes(routine, goal, level);
+  const exerciseIds = getRoutineExerciseIds(routine);
+  const dayCount = routine.days.length;
 
   return (
     <Pressable
@@ -53,9 +56,10 @@ export function RoutineCard({
       <Text className="text-xl font-bold text-foreground">{routine.name}</Text>
       <Text className="text-base text-foreground-muted">{routine.description}</Text>
       <Text className="text-sm text-foreground-subtle">
-        {routine.exerciseIds.length} ejercicios · ~{minutes} min
+        {dayCount > 1 ? `${dayCount} días · ` : ''}
+        {exerciseIds.length} ejercicios · ~{minutes} min por sesión
       </Text>
-      <RequirementTags requirements={getRequirements(routine.exerciseIds)} />
+      <RequirementTags requirements={getRequirements(exerciseIds)} />
     </Pressable>
   );
 }

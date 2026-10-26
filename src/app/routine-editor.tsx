@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { RoutineEditor } from '@/components/workout/routine-editor';
 import { useTraining } from '@/hooks/use-training';
+import { useUser } from '@/hooks/use-user';
 import type { CustomRoutineInput } from '@/utils/custom-routine';
 
 /** Creates a custom routine, or edits the one in the `id` param. */
 export default function RoutineEditorScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
+  const { user } = useUser();
   const { customRoutines, saveCustomRoutine, deleteCustomRoutine } = useTraining();
   const existing = id ? customRoutines.find((routine) => routine.id === id) : undefined;
 
@@ -39,10 +41,11 @@ export default function RoutineEditorScreen() {
   return (
     <Screen
       title={existing ? 'Editar rutina' : 'Nueva rutina'}
-      subtitle="Elige tus ejercicios. Series, repeticiones y descansos se ajustan a tu perfil."
+      subtitle="Reparte tus ejercicios a lo largo de la semana. Series, repeticiones y descansos se ajustan a tu perfil."
       hasHeader>
       <RoutineEditor
         initial={existing}
+        defaultDayCount={user?.trainingDaysPerWeek}
         onSave={handleSave}
         onDelete={existing ? handleDelete : undefined}
       />

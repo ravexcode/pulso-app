@@ -17,20 +17,23 @@ const routine: Routine = {
   description: '',
   place: 'gym',
   level: 'beginner',
-  exerciseIds: ['squat', 'plank'],
+  days: [{ focus: [], exerciseIds: ['squat', 'plank'] }],
 };
 
 // Beginner + build-muscle: squat 2 × 8–12 (rest 90–120–180), plank 2 × 30 s.
-const plan = planRoutine(routine, 'build-muscle', 'beginner');
+const plan = planRoutine(routine, 0, 'build-muscle', 'beginner');
 const start = 1_000_000;
 
-function run(actions: SessionAction[], state = createSession(routine, plan, start)): SessionState {
+function run(
+  actions: SessionAction[],
+  state = createSession(routine, 0, plan, start)
+): SessionState {
   return actions.reduce(sessionReducer, state);
 }
 
 describe('workout session', () => {
   it('starts ready on the first set of the first exercise', () => {
-    const state = createSession(routine, plan, start);
+    const state = createSession(routine, 0, plan, start);
 
     expect(state.phase).toEqual({ name: 'ready' });
     expect(state.exerciseIndex).toBe(0);
@@ -112,7 +115,7 @@ describe('workout session', () => {
   });
 
   it('ignores actions that do not fit the current phase', () => {
-    const state = createSession(routine, plan, start);
+    const state = createSession(routine, 0, plan, start);
 
     expect(sessionReducer(state, { type: 'endSet', now: start })).toBe(state);
     expect(sessionReducer(state, { type: 'logSet', effort: 'easy', reps: 5 })).toBe(state);
@@ -144,6 +147,7 @@ describe('workout session', () => {
       id: String(start),
       routineId: 'test',
       routineName: 'Test',
+      day: { index: 0, count: 1 },
       startedAt: new Date(start).toISOString(),
       endedAt: new Date(start + 60_000).toISOString(),
       durationSec: 60,
@@ -155,6 +159,25 @@ describe('workout session', () => {
   it('plans every exercise of a real routine', () => {
     const fullBody = getRoutine('full-body-home')!;
 
-    expect(planRoutine(fullBody, 'maintain', 'beginner')).toHaveLength(fullBody.exerciseIds.length);
+    expect(planRoutine(fullBody, 0, 'maintain', 'beginner')).toHaveLength(
+      fullBody.days[0].exerciseIds.length
+    );
+  });
+
+  it('plans only the exercises of the chosen day', () => {
+    const week: Routine = {
+      ...routine,
+      days: [
+        { focus: ['legs'], exerciseIds: ['squat'] },
+        { focus: ['chest'], exerciseIds: ['bench-press', 'push-up'] },
+      ],
+    };
+
+    expect(planRoutine(week, 1, 'maintain', 'beginner').map((item) => item.exercise.id)).toEqual([
+      'bench-press',
+      'push-up',
+    ]);
+    expect(planRoutine(week, 5, 'maintain', 'beginner')).toEqual([]);
+    expect(createSession(week, 1, [], start).day).toEqual({ index: 1, count: 2 });
   });
 });

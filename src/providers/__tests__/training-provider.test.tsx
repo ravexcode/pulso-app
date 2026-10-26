@@ -75,7 +75,10 @@ describe('TrainingProvider', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     const created = await act(() =>
-      result.current.saveCustomRoutine({ name: ' Brazos ', exerciseIds: ['biceps-curl'] })
+      result.current.saveCustomRoutine({
+        name: ' Brazos ',
+        days: [{ focus: ['biceps'], exerciseIds: ['biceps-curl'] }],
+      })
     );
     expect(result.current.customRoutines).toEqual([created]);
     expect(created.name).toBe('Brazos');
@@ -83,11 +86,17 @@ describe('TrainingProvider', () => {
     await act(() => result.current.selectRoutine(created.id));
     await act(() =>
       result.current.saveCustomRoutine(
-        { name: 'Brazos', exerciseIds: ['biceps-curl', 'hammer-curl'] },
+        {
+          name: 'Brazos',
+          days: [
+            { focus: ['biceps'], exerciseIds: ['biceps-curl', 'hammer-curl'] },
+            { focus: [], exerciseIds: ['biceps-curl'] },
+          ],
+        },
         created.id
       )
     );
-    expect(result.current.customRoutines[0].exerciseIds).toEqual(['biceps-curl', 'hammer-curl']);
+    expect(result.current.customRoutines[0].days).toHaveLength(2);
     await expect(loadTraining()).resolves.toMatchObject({
       customRoutines: result.current.customRoutines,
     });
@@ -103,7 +112,7 @@ describe('TrainingProvider', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await expect(
-      result.current.saveCustomRoutine({ name: 'Vacía', exerciseIds: [] })
+      result.current.saveCustomRoutine({ name: 'Vacía', days: [{ focus: [], exerciseIds: [] }] })
     ).rejects.toThrow(InvalidCustomRoutineError);
     await expect(loadTraining()).resolves.toMatchObject({ customRoutines: [] });
   });

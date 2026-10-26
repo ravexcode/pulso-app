@@ -13,6 +13,19 @@ export type ExerciseTracking = 'reps' | 'time';
 export const EQUIPMENT = ['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight'] as const;
 export type Equipment = (typeof EQUIPMENT)[number];
 
+/** Body parts used for the day focus, the filters and the automatic split. */
+export const BODY_PARTS = [
+  'chest',
+  'back',
+  'shoulders',
+  'biceps',
+  'triceps',
+  'legs',
+  'glutes',
+  'core',
+] as const;
+export type BodyPart = (typeof BODY_PARTS)[number];
+
 /** Everything an exercise needs, shown as tags. An empty list means no material at all. */
 export type Requirement =
   | 'barbell'
@@ -38,6 +51,16 @@ export type Exercise = {
   tracking: ExerciseTracking;
   equipment: Equipment;
   requires: Requirement[];
+  /** Main body part the exercise trains. */
+  bodyPart: BodyPart;
+};
+
+/** One training day of a week plan. */
+export type RoutineDay = {
+  /** Body parts the user wants to train that day. Only a label: exercises are chosen apart. */
+  focus: BodyPart[];
+  /** Exercise ids in the order they are performed. An exercise may repeat on other days. */
+  exerciseIds: string[];
 };
 
 export type Routine = {
@@ -49,15 +72,18 @@ export type Routine = {
   level?: Level;
   /** `true` for routines the user built by choosing exercises. */
   isCustom?: boolean;
-  /** Exercise ids in the order they are performed. */
-  exerciseIds: string[];
+  /**
+   * Training days of the week, in order. Plans with a single day repeat it on every training
+   * day.
+   */
+  days: RoutineDay[];
 };
 
-/** Routine the user built. It is saved on the device; `toRoutine` turns it into a `Routine`. */
+/** Week plan the user built. It is saved on the device; `toRoutine` turns it into a `Routine`. */
 export type CustomRoutine = {
   id: string;
   name: string;
-  exerciseIds: string[];
+  days: RoutineDay[];
   /** ISO 8601 timestamp. */
   createdAt: string;
   /** ISO 8601 timestamp. */
@@ -102,6 +128,8 @@ export type WorkoutLog = {
   id: string;
   routineId: string;
   routineName: string;
+  /** Day of the routine that was trained. Missing in workouts saved before week plans. */
+  day?: { index: number; count: number };
   /** ISO 8601 timestamp. */
   startedAt: string;
   /** ISO 8601 timestamp. */

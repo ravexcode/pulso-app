@@ -3,13 +3,13 @@ import { Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Card, Screen } from '@/components/ui/screen';
-import { GOAL_LABELS } from '@/constants/labels';
+import { BODY_PART_LABELS, GOAL_LABELS } from '@/constants/labels';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
 import { findRoutine } from '@/utils/custom-routine';
 import { formatDuration } from '@/utils/format';
-import { estimateRoutineMinutes } from '@/utils/prescription';
-import { countWorkoutsThisWeek, summarizeWorkout } from '@/utils/workout-log';
+import { estimateDayMinutes } from '@/utils/prescription';
+import { countWorkoutsThisWeek, getNextDayIndex, summarizeWorkout } from '@/utils/workout-log';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -22,6 +22,7 @@ export default function HomeScreen() {
   const doneThisWeek = countWorkoutsThisWeek(history);
   const weeklyGoal = user.trainingDaysPerWeek;
   const lastWorkout = history[0];
+  const nextDay = routine ? getNextDayIndex(history, routine) : 0;
 
   return (
     <Screen title={`Hola, ${user.name}`} subtitle={`Objetivo: ${GOAL_LABELS[user.goal]}`} hasTabBar>
@@ -47,14 +48,24 @@ export default function HomeScreen() {
           <Text className="text-sm font-semibold text-foreground-muted">Tu rutina</Text>
           <Text className="text-2xl font-bold text-foreground">{routine.name}</Text>
           <Text className="text-sm text-foreground-subtle">
-            {routine.exerciseIds.length} ejercicios · ~
-            {estimateRoutineMinutes(routine, user.goal, user.level)} min
+            {routine.days.length > 1
+              ? `Toca el día ${nextDay + 1} de ${routine.days.length}`
+              : `${routine.days[0].exerciseIds.length} ejercicios`}{' '}
+            · ~{estimateDayMinutes(routine.days[nextDay].exerciseIds, user.goal, user.level)} min
           </Text>
+          {routine.days[nextDay].focus.length > 0 && (
+            <Text className="text-sm text-foreground-muted">
+              Foco: {routine.days[nextDay].focus.map((part) => BODY_PART_LABELS[part]).join(', ')}
+            </Text>
+          )}
           <View className="gap-3 pt-2">
             <Button
-              title="Empezar entrenamiento"
+              title={routine.days.length > 1 ? `Empezar día ${nextDay + 1}` : 'Empezar entrenamiento'}
               onPress={() =>
-                router.push({ pathname: '/workout/[routineId]', params: { routineId: routine.id } })
+                router.push({
+                  pathname: '/workout/[routineId]',
+                  params: { routineId: routine.id, day: String(nextDay) },
+                })
               }
             />
             <Button

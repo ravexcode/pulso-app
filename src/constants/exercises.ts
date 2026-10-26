@@ -10,6 +10,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates', 'rack'],
+    bodyPart: 'legs',
   },
   {
     id: 'bench-press',
@@ -19,6 +20,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates', 'bench', 'rack'],
+    bodyPart: 'chest',
   },
   {
     id: 'barbell-row',
@@ -28,6 +30,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates'],
+    bodyPart: 'back',
   },
   {
     id: 'romanian-deadlift',
@@ -37,6 +40,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates'],
+    bodyPart: 'legs',
   },
   {
     id: 'deadlift',
@@ -46,6 +50,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates'],
+    bodyPart: 'back',
   },
   {
     id: 'overhead-press',
@@ -55,6 +60,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates', 'rack'],
+    bodyPart: 'shoulders',
   },
   {
     id: 'hip-thrust',
@@ -64,6 +70,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'barbell',
     requires: ['barbell', 'plates', 'bench'],
+    bodyPart: 'glutes',
   },
   // Dumbbells
   {
@@ -74,6 +81,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells'],
+    bodyPart: 'legs',
   },
   {
     id: 'dumbbell-bench-press',
@@ -83,6 +91,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells', 'bench'],
+    bodyPart: 'chest',
   },
   {
     id: 'incline-dumbbell-press',
@@ -92,6 +101,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells', 'incline-bench'],
+    bodyPart: 'chest',
   },
   {
     id: 'one-arm-dumbbell-row',
@@ -101,6 +111,77 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells', 'bench'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'dumbbell-bent-over-row',
+    name: 'Remo inclinado con mancuernas',
+    muscles: 'Dorsales, espalda media y bíceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'chest-supported-dumbbell-row',
+    name: 'Remo con mancuernas apoyado en banco',
+    muscles: 'Espalda media y dorsales',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'incline-bench'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'renegade-row',
+    name: 'Remo renegado',
+    muscles: 'Dorsales, core y hombros',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'mat'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'dumbbell-deadlift',
+    name: 'Peso muerto con mancuernas',
+    muscles: 'Espalda baja, glúteos e isquiotibiales',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'dumbbell-pullover',
+    name: 'Pullover con mancuerna',
+    muscles: 'Dorsales y pecho',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'bench'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'dumbbell-reverse-fly',
+    name: 'Pájaros con mancuernas',
+    muscles: 'Espalda alta y hombro posterior',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells'],
+    bodyPart: 'back',
+  },
+  {
+    id: 'dumbbell-shrug',
+    name: 'Encogimientos con mancuernas',
+    muscles: 'Trapecio',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells'],
+    bodyPart: 'back',
   },
   {
     id: 'dumbbell-shoulder-press',
@@ -110,6 +191,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells', 'bench'],
+    bodyPart: 'shoulders',
   },
   {
     id: 'dumbbell-lunge',
@@ -119,6 +201,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells'],
+    bodyPart: 'legs',
   },
   {
     id: 'lateral-raise',
@@ -128,6 +211,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells'],
+    bodyPart: 'shoulders',
   },
   {
     id: 'biceps-curl',
@@ -137,6 +221,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells'],
+    bodyPart: 'biceps',
   },
   {
     id: 'hammer-curl',
@@ -146,6 +231,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'dumbbell',
     requires: ['dumbbells'],
+    bodyPart: 'biceps',
   },
   // Machines
   {
@@ -156,6 +242,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'machine',
     requires: ['leg-press'],
+    bodyPart: 'legs',
   },
   {
     id: 'chest-press-machine',
@@ -165,6 +252,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'machine',
     requires: ['chest-press'],
+    bodyPart: 'chest',
   },
   {
     id: 'leg-curl',
@@ -174,6 +262,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'machine',
     requires: ['leg-curl'],
+    bodyPart: 'legs',
   },
   {
     id: 'leg-extension',
@@ -183,6 +272,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'machine',
     requires: ['leg-extension'],
+    bodyPart: 'legs',
   },
   // Cable
   {
@@ -193,6 +283,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'cable',
     requires: ['cable'],
+    bodyPart: 'back',
   },
   {
     id: 'seated-cable-row',
@@ -202,6 +293,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'cable',
     requires: ['cable'],
+    bodyPart: 'back',
   },
   {
     id: 'triceps-pushdown',
@@ -211,6 +303,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'cable',
     requires: ['cable'],
+    bodyPart: 'triceps',
   },
   {
     id: 'face-pull',
@@ -220,6 +313,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'cable',
     requires: ['cable'],
+    bodyPart: 'shoulders',
   },
   // Bodyweight
   {
@@ -230,6 +324,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: [],
+    bodyPart: 'legs',
   },
   {
     id: 'push-up',
@@ -239,6 +334,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: [],
+    bodyPart: 'chest',
   },
   {
     id: 'pull-up',
@@ -248,6 +344,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: ['pull-up-bar'],
+    bodyPart: 'back',
   },
   {
     id: 'reverse-lunge',
@@ -257,6 +354,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: [],
+    bodyPart: 'legs',
   },
   {
     id: 'pike-push-up',
@@ -266,6 +364,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: [],
+    bodyPart: 'shoulders',
   },
   {
     id: 'glute-bridge',
@@ -275,6 +374,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: ['mat'],
+    bodyPart: 'glutes',
   },
   {
     id: 'superman',
@@ -284,6 +384,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'reps',
     equipment: 'bodyweight',
     requires: ['mat'],
+    bodyPart: 'core',
   },
   {
     id: 'plank',
@@ -293,6 +394,7 @@ const EXERCISE_LIST: Exercise[] = [
     tracking: 'time',
     equipment: 'bodyweight',
     requires: ['mat'],
+    bodyPart: 'core',
   },
 ];
 

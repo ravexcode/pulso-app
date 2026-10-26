@@ -6,27 +6,32 @@ import { Chip } from '@/components/ui/chip';
 import { TextField } from '@/components/ui/text-field';
 import { RequirementTags } from '@/components/workout/requirement-tags';
 import { EXERCISE_CATALOG } from '@/constants/exercises';
-import { EQUIPMENT_LABELS } from '@/constants/labels';
-import { EQUIPMENT, type Equipment } from '@/types/workout';
+import { BODY_PART_LABELS, EQUIPMENT_LABELS } from '@/constants/labels';
+import { BODY_PARTS, EQUIPMENT, type BodyPart, type Equipment } from '@/types/workout';
 import { filterExercises } from '@/utils/exercise-filter';
 
 type ExercisePickerProps = {
+  /** Exercises already in the day. */
   selectedIds: readonly string[];
   onToggle: (exerciseId: string) => void;
-  /** `true` when no more exercises fit in the routine. */
-  isFull: boolean;
+  /** Body parts selected when the picker opens, usually the focus of the day. */
+  initialBodyParts?: readonly BodyPart[];
 };
 
-/** Exercise catalog with equipment filters and a search field. */
-export function ExercisePicker({ selectedIds, onToggle, isFull }: ExercisePickerProps) {
-  const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const [query, setQuery] = useState('');
-  const exercises = filterExercises(EXERCISE_CATALOG, { equipment, query });
+function toggleItem<T>(items: readonly T[], item: T): T[] {
+  return items.includes(item) ? items.filter((value) => value !== item) : [...items, item];
+}
 
-  const toggleEquipment = (item: Equipment) =>
-    setEquipment((current) =>
-      current.includes(item) ? current.filter((value) => value !== item) : [...current, item]
-    );
+/** Exercise catalog with equipment and body part filters and a search field. */
+export function ExercisePicker({
+  selectedIds,
+  onToggle,
+  initialBodyParts = [],
+}: ExercisePickerProps) {
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [bodyParts, setBodyParts] = useState<BodyPart[]>([...initialBodyParts]);
+  const [query, setQuery] = useState('');
+  const exercises = filterExercises(EXERCISE_CATALOG, { equipment, bodyParts, query });
 
   return (
     <View className="gap-4">
@@ -34,7 +39,7 @@ export function ExercisePicker({ selectedIds, onToggle, isFull }: ExercisePicker
         label="Buscar ejercicio"
         value={query}
         onChangeText={setQuery}
-        placeholder="Ej.: sentadilla, espalda, tríceps"
+        placeholder="Ej.: sentadilla, remo, tríceps"
         hint="Busca por nombre o por músculo."
         autoCapitalize="none"
         autoCorrect={false}
@@ -50,12 +55,31 @@ export function ExercisePicker({ selectedIds, onToggle, isFull }: ExercisePicker
               key={item}
               label={EQUIPMENT_LABELS[item]}
               selected={equipment.includes(item)}
-              onPress={() => toggleEquipment(item)}
+              onPress={() => setEquipment((current) => toggleItem(current, item))}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View className="gap-2">
+        <Text className="text-sm font-semibold text-foreground-muted">Parte del cuerpo</Text>
+        <View className="flex-row flex-wrap gap-2">
+          <Chip
+            label="Todas"
+            selected={bodyParts.length === 0}
+            onPress={() => setBodyParts([])}
+          />
+          {BODY_PARTS.map((part) => (
+            <Chip
+              key={part}
+              label={BODY_PART_LABELS[part]}
+              selected={bodyParts.includes(part)}
+              onPress={() => setBodyParts((current) => toggleItem(current, part))}
             />
           ))}
         </View>
         <Text className="text-sm text-foreground-subtle">
-          Elige uno o varios. Las etiquetas de cada ejercicio muestran lo que necesitas.
+          Elige uno o varios filtros. Las etiquetas de cada ejercicio muestran lo que necesitas.
         </Text>
       </View>
 
@@ -77,7 +101,7 @@ export function ExercisePicker({ selectedIds, onToggle, isFull }: ExercisePicker
               <View className="flex-1 gap-1">
                 <Text className="text-base font-semibold text-foreground">{exercise.name}</Text>
                 <Text className="text-sm text-foreground-subtle">
-                  {exercise.muscles} ·{' '}
+                  {BODY_PART_LABELS[exercise.bodyPart]} · {exercise.muscles} ·{' '}
                   {exercise.kind === 'compound' ? 'Multiarticular' : 'Aislamiento'}
                 </Text>
               </View>
@@ -86,7 +110,6 @@ export function ExercisePicker({ selectedIds, onToggle, isFull }: ExercisePicker
                 accessibilityLabel={`${isSelected ? 'Quitar' : 'Añadir'} ${exercise.name}`}
                 variant={isSelected ? 'primary' : 'secondary'}
                 size="small"
-                disabled={!isSelected && isFull}
                 onPress={() => onToggle(exercise.id)}
               />
             </View>

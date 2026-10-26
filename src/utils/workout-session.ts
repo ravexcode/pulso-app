@@ -34,6 +34,8 @@ export type SessionPhase =
 export type SessionState = {
   routineId: string;
   routineName: string;
+  /** Day of the routine being trained. */
+  day: { index: number; count: number };
   startedAt: number;
   plan: PlannedExercise[];
   /** Index in `plan` of the exercise of the next (or current) set. */
@@ -51,8 +53,16 @@ export type SessionAction =
   | { type: 'adjustRest'; seconds: number }
   | { type: 'finish'; now: number };
 
-export function planRoutine(routine: Routine, goal: Goal, level: Level): PlannedExercise[] {
-  return routine.exerciseIds.map((id) => {
+/** Exercises of one day of the routine, with their sets, repetitions and rest. */
+export function planRoutine(
+  routine: Routine,
+  dayIndex: number,
+  goal: Goal,
+  level: Level
+): PlannedExercise[] {
+  const day = routine.days[dayIndex];
+  if (!day) return [];
+  return day.exerciseIds.map((id) => {
     const exercise = getExercise(id);
     return { exercise, prescription: getPrescription(exercise, goal, level) };
   });
@@ -60,12 +70,14 @@ export function planRoutine(routine: Routine, goal: Goal, level: Level): Planned
 
 export function createSession(
   routine: Routine,
+  dayIndex: number,
   plan: PlannedExercise[],
   now: number
 ): SessionState {
   return {
     routineId: routine.id,
     routineName: routine.name,
+    day: { index: dayIndex, count: routine.days.length },
     startedAt: now,
     plan,
     exerciseIndex: 0,
@@ -184,6 +196,7 @@ export function toWorkoutLog(state: SessionState): WorkoutLog {
     id: String(state.startedAt),
     routineId: state.routineId,
     routineName: state.routineName,
+    day: state.day,
     startedAt: new Date(state.startedAt).toISOString(),
     endedAt: new Date(endedAt).toISOString(),
     durationSec: toSeconds(endedAt - state.startedAt),

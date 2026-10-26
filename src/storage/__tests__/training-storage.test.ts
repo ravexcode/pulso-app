@@ -38,7 +38,10 @@ const log: WorkoutLog = {
 const customRoutine: CustomRoutine = {
   id: 'custom-1',
   name: 'Mancuernas en casa',
-  exerciseIds: ['goblet-squat', 'biceps-curl'],
+  days: [
+    { focus: ['legs'], exerciseIds: ['goblet-squat'] },
+    { focus: [], exerciseIds: ['biceps-curl', 'goblet-squat'] },
+  ],
   createdAt: '2026-10-25T10:00:00.000Z',
   updatedAt: '2026-10-25T10:00:00.000Z',
 };
@@ -76,7 +79,10 @@ describe('training storage', () => {
       fileUri,
       JSON.stringify({
         activeRoutineId: 7,
-        customRoutines: [customRoutine, { ...customRoutine, exerciseIds: ['unknown'] }],
+        customRoutines: [
+          customRoutine,
+          { ...customRoutine, days: [{ focus: [], exerciseIds: ['unknown'] }] },
+        ],
         history: [log, { ...log, durationSec: 'long' }],
       })
     );
@@ -96,6 +102,24 @@ describe('training storage', () => {
       customRoutines: [],
       history: [log],
     });
+  });
+
+  it('turns custom routines saved before week plans into a one-day plan', async () => {
+    const { days: _days, ...legacy } = customRoutine;
+    __setFileContent(
+      fileUri,
+      JSON.stringify({
+        activeRoutineId: null,
+        customRoutines: [{ ...legacy, exerciseIds: ['squat', 'plank'] }],
+        history: [],
+      })
+    );
+
+    const loaded = await loadTraining();
+
+    expect(loaded.customRoutines).toEqual([
+      { ...legacy, days: [{ focus: [], exerciseIds: ['squat', 'plank'] }] },
+    ]);
   });
 
   it('deletes the file', async () => {

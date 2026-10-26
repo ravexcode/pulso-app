@@ -2,6 +2,7 @@ import '@/global.css';
 
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { Colors } from '@/constants/theme';
@@ -58,12 +59,14 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={theme}>
-      <UserProvider>
-        <TrainingProvider>
-          <RootNavigator />
-        </TrainingProvider>
-      </UserProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={theme}>
+        <UserProvider>
+          <TrainingProvider>
+            <RootNavigator />
+          </TrainingProvider>
+        </UserProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

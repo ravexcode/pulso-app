@@ -30,7 +30,10 @@ export default function HistoryScreen() {
                 month: 'long',
               })}
             </Text>
-            <Text className="text-xl font-bold text-foreground">{log.routineName}</Text>
+            <Text className="text-xl font-bold text-foreground">
+              {log.routineName}
+              {log.day && log.day.count > 1 ? ` · Día ${log.day.index + 1}` : ''}
+            </Text>
             <Text className="text-sm text-foreground-muted">
               {formatDuration(log.durationSec)} total · {summary.setCount} series · Descanso{' '}
               {formatDuration(summary.restSec)}

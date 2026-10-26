@@ -127,14 +127,29 @@ export function calculateRest(
   return Math.min(rest.max, Math.max(rest.min, roundTo5(rest.base * factor)));
 }
 
-/** Estimated duration of a whole routine in minutes, with the base rest between sets. */
-export function estimateRoutineMinutes(routine: Routine, goal: Goal, level: Level): number {
+/** Estimated duration of one training day in minutes, with the base rest between sets. */
+export function estimateDayMinutes(
+  exerciseIds: readonly string[],
+  goal: Goal,
+  level: Level
+): number {
   let seconds = 0;
-  routine.exerciseIds.forEach((id) => {
+  exerciseIds.forEach((id) => {
     const { sets, target, rest } = getPrescription(getExercise(id), goal, level);
     const setSeconds =
       target.kind === 'time' ? target.seconds : ((target.min + target.max) / 2) * SECONDS_PER_REP;
     seconds += sets * (setSeconds + rest.base);
   });
   return Math.round(seconds / 60);
+}
+
+/** Average duration of the training days (days without exercises are skipped). */
+export function estimateRoutineMinutes(routine: Routine, goal: Goal, level: Level): number {
+  const days = routine.days.filter((day) => day.exerciseIds.length > 0);
+  if (days.length === 0) return 0;
+  const total = days.reduce(
+    (sum, day) => sum + estimateDayMinutes(day.exerciseIds, goal, level),
+    0
+  );
+  return Math.round(total / days.length);
 }

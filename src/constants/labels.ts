@@ -1,5 +1,5 @@
 import type { Goal, Level, Sex, Units } from '@/types/user';
-import type { Effort, Equipment, Requirement, Routine } from '@/types/workout';
+import type { BodyPart, Effort, Equipment, Requirement, Routine } from '@/types/workout';
 
 export const SEX_LABELS: Record<Sex, string> = {
   male: 'Hombre',
@@ -62,3 +62,14 @@ export const REQUIREMENT_LABELS: Record<Requirement, string> = {
 
 /** Tag for exercises that need nothing. */
 export const NO_REQUIREMENTS_LABEL = 'Sin material';
+
+export const BODY_PART_LABELS: Record<BodyPart, string> = {
+  chest: 'Pecho',
+  back: 'Espalda',
+  shoulders: 'Hombros',
+  biceps: 'Bíceps',
+  triceps: 'Tríceps',
+  legs: 'Piernas',
+  glutes: 'Glúteos',
+  core: 'Core',
+};

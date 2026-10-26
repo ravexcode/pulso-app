@@ -1,5 +1,6 @@
 import { EXERCISES } from '@/constants/exercises';
 import { ROUTINES } from '@/constants/routines';
+import { getRoutineExerciseIds } from '@/utils/custom-routine';
 
 describe('routines', () => {
   it('has unique ids', () => {
@@ -11,14 +12,14 @@ describe('routines', () => {
   it.each(ROUTINES.map((routine) => [routine.name, routine] as const))(
     '%s only uses known exercises',
     (_, routine) => {
-      routine.exerciseIds.forEach((id) => expect(EXERCISES[id]).toBeDefined());
+      getRoutineExerciseIds(routine).forEach((id) => expect(EXERCISES[id]).toBeDefined());
     }
   );
 
   it.each(ROUTINES.map((routine) => [routine.name, routine] as const))(
     '%s puts compound exercises before isolation exercises',
     (_, routine) => {
-      const kinds = routine.exerciseIds.map((id) => EXERCISES[id].kind);
+      const kinds = routine.days[0].exerciseIds.map((id) => EXERCISES[id].kind);
       const firstIsolation = kinds.indexOf('isolation');
 
       if (firstIsolation >= 0) {
@@ -29,7 +30,9 @@ describe('routines', () => {
 
   it('home routines only use bodyweight exercises', () => {
     ROUTINES.filter((routine) => routine.place === 'home').forEach((routine) => {
-      routine.exerciseIds.forEach((id) => expect(EXERCISES[id].equipment).toBe('bodyweight'));
+      getRoutineExerciseIds(routine).forEach((id) =>
+        expect(EXERCISES[id].equipment).toBe('bodyweight')
+      );
     });
   });
 });
@@ -47,5 +50,15 @@ describe('exercise catalog', () => {
     exercises.forEach((exercise) =>
       expect(new Set(exercise.requires).size).toBe(exercise.requires.length)
     );
+  });
+});
+
+describe('dumbbell back exercises', () => {
+  it('offers several back exercises that only need dumbbells and a bench at most', () => {
+    const backWithDumbbells = Object.values(EXERCISES).filter(
+      (exercise) => exercise.bodyPart === 'back' && exercise.equipment === 'dumbbell'
+    );
+
+    expect(backWithDumbbells.length).toBeGreaterThanOrEqual(6);
   });
 });

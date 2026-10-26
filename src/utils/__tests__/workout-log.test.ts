@@ -1,7 +1,8 @@
-import type { WorkoutLog } from '@/types/workout';
+import type { Routine, WorkoutLog } from '@/types/workout';
 import {
   countWorkoutsThisWeek,
   getLastWeightKg,
+  getNextDayIndex,
   getStartOfWeek,
   isWorkoutLog,
   summarizeWorkout,
@@ -91,5 +92,34 @@ describe('getLastWeightKg', () => {
 
     expect(getLastWeightKg(history, 'squat')).toBe(62.5);
     expect(getLastWeightKg(history, 'bench-press')).toBeUndefined();
+  });
+});
+
+describe('getNextDayIndex', () => {
+  const routine: Routine = {
+    id: 'week',
+    name: 'Semana',
+    description: '',
+    place: 'gym',
+    days: [
+      { focus: [], exerciseIds: ['squat'] },
+      { focus: [], exerciseIds: [] },
+      { focus: [], exerciseIds: ['bench-press'] },
+    ],
+  };
+  const trained = (index: number, routineId = 'week') =>
+    makeLog('2026-10-20T10:00:00.000Z', { routineId, day: { index, count: 3 } });
+
+  it('starts on the first day', () => {
+    expect(getNextDayIndex([], routine)).toBe(0);
+  });
+
+  it('goes to the next day with exercises and wraps around the week', () => {
+    expect(getNextDayIndex([trained(0)], routine)).toBe(2);
+    expect(getNextDayIndex([trained(2)], routine)).toBe(0);
+  });
+
+  it('ignores other routines', () => {
+    expect(getNextDayIndex([trained(0, 'other')], routine)).toBe(0);
   });
 });

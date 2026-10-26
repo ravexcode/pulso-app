@@ -5,7 +5,7 @@
 
 import { readText, removeFile, writeText } from '@/storage/file-store';
 import type { CustomRoutine, WorkoutLog } from '@/types/workout';
-import { isCustomRoutine } from '@/utils/custom-routine';
+import { parseCustomRoutine } from '@/utils/custom-routine';
 import { isWorkoutLog } from '@/utils/workout-log';
 
 export const TRAINING_FILE_NAME = 'training.json';
@@ -49,7 +49,7 @@ export async function loadTraining(): Promise<TrainingData> {
   return {
     activeRoutineId: typeof record.activeRoutineId === 'string' ? record.activeRoutineId : null,
     customRoutines: Array.isArray(record.customRoutines)
-      ? record.customRoutines.filter(isCustomRoutine)
+      ? record.customRoutines.flatMap((item) => parseCustomRoutine(item) ?? [])
       : [],
     history: Array.isArray(record.history) ? record.history.filter(isWorkoutLog) : [],
   };

@@ -26,6 +26,8 @@ const REST_STEP_SEC = 15;
 
 type WorkoutSessionProps = {
   routine: Routine;
+  /** Day of the routine to train. */
+  dayIndex: number;
   plan: PlannedExercise[];
   units: Units;
   /** Past workouts, newest first, used to pre-fill weights. */
@@ -56,6 +58,7 @@ function BigTimer({ seconds, label }: { seconds: number; label: string }) {
 
 export function WorkoutSession({
   routine,
+  dayIndex,
   plan,
   units,
   history,
@@ -63,7 +66,7 @@ export function WorkoutSession({
   onExit,
 }: WorkoutSessionProps) {
   const [state, dispatch] = useReducer(sessionReducer, undefined, () =>
-    createSession(routine, plan, Date.now())
+    createSession(routine, dayIndex, plan, Date.now())
   );
   const [isSaving, setIsSaving] = useState(false);
   const { phase } = state;
@@ -129,6 +132,7 @@ export function WorkoutSession({
             <View className="flex-1">
               <Text className="text-base font-semibold text-foreground" numberOfLines={1}>
                 {routine.name}
+                {routine.days.length > 1 && ` · Día ${dayIndex + 1}`}
               </Text>
               <Text
                 className="text-sm text-foreground-subtle"

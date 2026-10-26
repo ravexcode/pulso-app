@@ -34,6 +34,21 @@ describe('filterExercises', () => {
   });
 });
 
+describe('body part filter', () => {
+  it('shows only the chosen body parts', () => {
+    const back = filterExercises(EXERCISE_CATALOG, {
+      equipment: ['dumbbell'],
+      bodyParts: ['back'],
+      query: '',
+    });
+
+    expect(back.map((exercise) => exercise.id)).toEqual(
+      expect.arrayContaining(['one-arm-dumbbell-row', 'dumbbell-bent-over-row', 'dumbbell-pullover'])
+    );
+    back.forEach((exercise) => expect(exercise.bodyPart).toBe('back'));
+  });
+});
+
 describe('getRequirements', () => {
   it('joins the requirements without repeats, in a stable order', () => {
     expect(getRequirements(['bench-press', 'squat', 'biceps-curl'])).toEqual([

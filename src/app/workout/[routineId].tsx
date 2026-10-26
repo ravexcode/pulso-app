@@ -10,14 +10,15 @@ import { findRoutine } from '@/utils/custom-routine';
 import { planRoutine } from '@/utils/workout-session';
 
 export default function WorkoutScreen() {
-  const { routineId } = useLocalSearchParams<{ routineId: string }>();
+  const { routineId, day } = useLocalSearchParams<{ routineId: string; day?: string }>();
   const router = useRouter();
   const { user } = useUser();
   const { history, customRoutines, addWorkout } = useTraining();
   const routine = findRoutine(routineId, customRoutines);
+  const dayIndex = Number(day ?? 0) || 0;
   // The plan is fixed when the workout starts, even if the profile changes meanwhile.
   const [plan] = useState(() =>
-    routine && user ? planRoutine(routine, user.goal, user.level) : []
+    routine && user ? planRoutine(routine, dayIndex, user.goal, user.level) : []
   );
 
   const exit = () => (router.canGoBack() ? router.back() : router.replace('/'));
@@ -33,6 +34,7 @@ export default function WorkoutScreen() {
   return (
     <WorkoutSession
       routine={routine}
+      dayIndex={dayIndex}
       plan={plan}
       units={user.units}
       history={history}
