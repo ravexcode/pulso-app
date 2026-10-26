@@ -1,56 +1,81 @@
-# Welcome to your Expo app 👋
+# Pulso
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Pulso es una aplicación móvil personal para planificar y registrar entrenamientos de **bodybuilding**. El proyecto está pensado para uso propio: ayuda a organizar sesiones, ejercicios y progresión sin sustituir la orientación de un entrenador o profesional sanitario.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- [Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/) y [React Native 0.88](https://reactnative.dev/)
+- [React 19](https://react.dev/) con [TypeScript](https://www.typescriptlang.org/)
+- [Expo Router](https://docs.expo.dev/router/introduction/) para navegación basada en archivos
+- [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/), Gesture Handler y Safe Area Context
+- Expo Image, Constants, Device, Font, Linking, Splash Screen, Status Bar, Symbols, System UI y Web Browser
+- [Expo UI](https://docs.expo.dev/versions/v58.0.0/sdk/ui/) para componentes nativos
+- pnpm para gestión de dependencias y GitHub Actions para validaciones y builds Android
 
-   ```bash
-   npm install
-   ```
+## Requisitos
 
-2. Start the app
+- Node.js `22.13.x` o compatible con Expo SDK 58
+- pnpm 10+
+- Android Studio y un emulador Android, o un dispositivo Android con depuración habilitada
+- Para builds en la nube: una cuenta de [Expo](https://expo.dev/) y `EXPO_TOKEN`
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Instalación
 
 ```bash
-npm run reset-project
+git clone <URL_DEL_REPOSITORIO>
+cd pulso-android
+pnpm install
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Inicia el proyecto con:
 
-### Other setup steps
+```bash
+pnpm start          # menú de Expo
+pnpm android        # abre en Android
+pnpm web            # versión web
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+También puedes abrir el proyecto con Expo Go cuando las APIs usadas estén disponibles. Para módulos nativos o un entorno más cercano a producción, usa un development build.
 
-## Learn more
+## Desarrollo
 
-To learn more about developing your project with Expo, look at the following resources:
+Las pantallas viven en `src/app/` y siguen el enrutamiento basado en archivos de Expo Router. Los componentes reutilizables están en `src/components/`, los hooks en `src/hooks/` y los tokens visuales en `src/constants/`.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Antes de abrir un pull request:
 
-## Join the community
+```bash
+pnpm lint
+pnpm exec tsc --noEmit
+```
 
-Join our community of developers creating universal apps.
+## Build Android
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Los builds Android se ejecutan con [EAS Build](https://docs.expo.dev/build/introduction/):
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile preview
+```
+
+El workflow de GitHub Actions de `.github/workflows/android-build.yml` ejecuta el mismo build al hacer push a `master` o manualmente. Configura el secreto `EXPO_TOKEN` en el repositorio antes de usarlo. El proyecto debe estar vinculado a un proyecto de Expo/EAS para builds no interactivos.
+
+## Uso
+
+1. Abre la app y revisa la sesión disponible.
+2. Selecciona el grupo muscular y los ejercicios de la sesión.
+3. Registra series, repeticiones, carga y notas.
+4. Usa el historial para observar la progresión y ajustar el siguiente entrenamiento.
+
+La información de entrenamiento es orientativa. Entrena dentro de tus límites y detente si sientes dolor o malestar.
+
+## Licencia
+
+Pulso se distribuye bajo una **licencia de uso personal y no comercial**. No está permitido vender, sublicenciar, redistribuir como producto comercial ni usar el proyecto para prestar servicios comerciales sin autorización escrita. Consulta [LICENSE](./LICENSE).
+
+Las dependencias de terceros conservan sus propias licencias.
+
+## Políticas del repositorio
+
+- [Contribución](./.github/CONTRIBUTING.md)
+- [Política de la rama master](./.github/policies/master.md)
+- [Seguridad](./.github/SECURITY.md)

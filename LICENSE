@@ -1,21 +1,32 @@
-The MIT License (MIT)
+LICENCIA DE USO PERSONAL Y NO COMERCIAL
 
-Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)
+Copyright (c) 2026 Pulso contributors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Permiso de uso personal
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Se concede permiso, de forma limitada, revocable y no exclusiva, para
+obtener, instalar, ejecutar, estudiar y modificar este software únicamente
+para fines personales, educativos y no comerciales.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. Restricciones
+
+Sin autorización previa y escrita del titular de los derechos no se permite:
+
+- vender, alquilar, sublicenciar o monetizar el software o una modificación;
+- usarlo para prestar servicios comerciales a terceros;
+- redistribuirlo como aplicación, producto, plantilla o paquete comercial;
+- eliminar esta licencia o atribuirse la autoría del proyecto.
+
+3. Dependencias y contenido de terceros
+
+Las dependencias, marcas, iconos y demás materiales de terceros no están
+cubiertos por esta licencia y permanecen sujetos a sus respectivas licencias.
+
+4. Ausencia de garantía
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA EXPRESA NI IMPLÍCITA.
+EL TITULAR NO SERÁ RESPONSABLE DE DAÑOS DERIVADOS DE SU USO. PULSO NO ES
+CONSEJO MÉDICO NI SUSTITUYE LA SUPERVISIÓN DE UN PROFESIONAL DEL DEPORTE O
+DE LA SALUD.
+
+Para solicitar autorización comercial, contacta con el titular del proyecto.
