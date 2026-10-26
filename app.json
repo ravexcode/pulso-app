@@ -38,6 +38,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2ef03951-e15c-462c-a890-0eb51bfcee67"
+      }
+    },
+    "owner": "ravexcode"
   }
 }
