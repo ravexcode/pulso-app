@@ -1,98 +1,90 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { Text, View } from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { Button } from '@/components/ui/button';
+import { Card, Screen } from '@/components/ui/screen';
+import { GOAL_LABELS } from '@/constants/labels';
+import { getRoutine } from '@/constants/routines';
+import { useTraining } from '@/hooks/use-training';
+import { useUser } from '@/hooks/use-user';
+import { formatDuration } from '@/utils/format';
+import { estimateRoutineMinutes } from '@/utils/prescription';
+import { countWorkoutsThisWeek, summarizeWorkout } from '@/utils/workout-log';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { user } = useUser();
+  const { activeRoutineId, history } = useTraining();
+
+  if (!user) return null;
+
+  const routine = activeRoutineId ? getRoutine(activeRoutineId) : undefined;
+  const doneThisWeek = countWorkoutsThisWeek(history);
+  const weeklyGoal = user.trainingDaysPerWeek;
+  const lastWorkout = history[0];
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+    <Screen title={`Hola, ${user.name}`} subtitle={`Objetivo: ${GOAL_LABELS[user.goal]}`} hasTabBar>
+      <Card>
+        <Text className="text-sm font-semibold text-foreground-muted">Esta semana</Text>
+        <Text className="text-3xl font-bold text-foreground">
+          {doneThisWeek} de {weeklyGoal} entrenamientos
+        </Text>
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityValue={{ min: 0, max: weeklyGoal, now: Math.min(doneThisWeek, weeklyGoal) }}
+          className="h-3 overflow-hidden rounded-full bg-background-400">
+          <View
+            className="h-full rounded-full bg-accent"
+            style={{ width: `${Math.min(100, (doneThisWeek / weeklyGoal) * 100)}%` }}
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        </View>
+      </Card>
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      {routine ? (
+        <Card>
+          <Text className="text-sm font-semibold text-foreground-muted">Tu rutina</Text>
+          <Text className="text-2xl font-bold text-foreground">{routine.name}</Text>
+          <Text className="text-sm text-foreground-subtle">
+            {routine.exerciseIds.length} ejercicios · ~
+            {estimateRoutineMinutes(routine, user.goal, user.level)} min
+          </Text>
+          <View className="gap-3 pt-2">
+            <Button
+              title="Empezar entrenamiento"
+              onPress={() =>
+                router.push({ pathname: '/workout/[routineId]', params: { routineId: routine.id } })
+              }
+            />
+            <Button
+              title="Cambiar rutina"
+              variant="secondary"
+              onPress={() => router.push('/routines')}
+            />
+          </View>
+        </Card>
+      ) : (
+        <Card>
+          <Text className="text-2xl font-bold text-foreground">Elige tu rutina</Text>
+          <Text className="text-base text-foreground-muted">
+            Tenemos rutinas de cuerpo completo para gimnasio y para casa.
+          </Text>
+          <Button title="Ver rutinas" onPress={() => router.push('/routines')} />
+        </Card>
+      )}
+
+      {lastWorkout && (
+        <Card>
+          <Text className="text-sm font-semibold text-foreground-muted">Último entrenamiento</Text>
+          <Text className="text-xl font-bold text-foreground">{lastWorkout.routineName}</Text>
+          <Text className="text-sm text-foreground-subtle">
+            {new Date(lastWorkout.startedAt).toLocaleDateString('es')} ·{' '}
+            {formatDuration(lastWorkout.durationSec)} · {summarizeWorkout(lastWorkout).setCount}{' '}
+            series
+          </Text>
+        </Card>
+      )}
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});

@@ -14,6 +14,7 @@ const darkColors = {
   backgroundElement: background[600],
   backgroundSelected: background[400],
   textSecondary: foreground.muted,
+  textSubtle: foreground.subtle,
   accent: accent.DEFAULT,
   textOnAccent: foreground.inverse,
 } as const;

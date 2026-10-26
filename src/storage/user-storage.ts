@@ -1,29 +1,23 @@
 /**
- * Keeps the user profile as a JSON file in the app's document directory. The file stays on
- * the device and the system does not clear it, but uninstalling the app removes it.
+ * Keeps the user profile as a JSON file on the device (see `file-store.ts`).
  */
 
-import { File, Paths } from 'expo-file-system';
-
+import { readText, removeFile, writeText } from '@/storage/file-store';
 import type { UserProfile } from '@/types/user';
 import { isUserProfile } from '@/utils/user-profile';
 
 export const USER_FILE_NAME = 'user.json';
 
-function getUserFile() {
-  return new File(Paths.document, USER_FILE_NAME);
-}
-
 /** Returns `null` when there is no saved profile or the file content is not a valid profile. */
 export async function loadUser(): Promise<UserProfile | null> {
-  const file = getUserFile();
-  if (!file.exists) {
+  const text = await readText(USER_FILE_NAME);
+  if (text === null) {
     return null;
   }
 
   let data: unknown;
   try {
-    data = JSON.parse(await file.text());
+    data = JSON.parse(text);
   } catch {
     return null;
   }
@@ -31,16 +25,9 @@ export async function loadUser(): Promise<UserProfile | null> {
 }
 
 export async function saveUser(profile: UserProfile): Promise<void> {
-  const file = getUserFile();
-  if (!file.exists) {
-    file.create({ intermediates: true });
-  }
-  await file.write(JSON.stringify(profile));
+  await writeText(USER_FILE_NAME, JSON.stringify(profile));
 }
 
 export function deleteUser(): void {
-  const file = getUserFile();
-  if (file.exists) {
-    file.delete();
-  }
+  removeFile(USER_FILE_NAME);
 }
