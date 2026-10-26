@@ -11,6 +11,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.ravexcode.pulso",
       "adaptiveIcon": {
         "backgroundColor": "#080808",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
