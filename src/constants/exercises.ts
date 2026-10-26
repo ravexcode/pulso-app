@@ -1,7 +1,7 @@
 import type { Exercise } from '@/types/workout';
 
 const EXERCISE_LIST: Exercise[] = [
-  // Gym, barbell
+  // Barbell
   {
     id: 'squat',
     name: 'Sentadilla con barra',
@@ -9,6 +9,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates', 'rack'],
   },
   {
     id: 'bench-press',
@@ -17,6 +18,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates', 'bench', 'rack'],
   },
   {
     id: 'barbell-row',
@@ -25,6 +27,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates'],
   },
   {
     id: 'romanian-deadlift',
@@ -33,6 +36,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates'],
   },
   {
     id: 'deadlift',
@@ -41,6 +45,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates'],
   },
   {
     id: 'overhead-press',
@@ -49,15 +54,35 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'barbell',
+    requires: ['barbell', 'plates', 'rack'],
   },
-  // Gym, dumbbells
   {
-    id: 'dumbbell-shoulder-press',
-    name: 'Press de hombros con mancuernas',
-    muscles: 'Hombros y tríceps',
+    id: 'hip-thrust',
+    name: 'Hip thrust con barra',
+    muscles: 'Glúteos',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'barbell',
+    requires: ['barbell', 'plates', 'bench'],
+  },
+  // Dumbbells
+  {
+    id: 'goblet-squat',
+    name: 'Sentadilla goblet',
+    muscles: 'Cuádriceps y glúteos',
     kind: 'compound',
     tracking: 'reps',
     equipment: 'dumbbell',
+    requires: ['dumbbells'],
+  },
+  {
+    id: 'dumbbell-bench-press',
+    name: 'Press de banca con mancuernas',
+    muscles: 'Pecho, hombros y tríceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'bench'],
   },
   {
     id: 'incline-dumbbell-press',
@@ -66,6 +91,25 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'dumbbell',
+    requires: ['dumbbells', 'incline-bench'],
+  },
+  {
+    id: 'one-arm-dumbbell-row',
+    name: 'Remo a una mano con mancuerna',
+    muscles: 'Espalda y bíceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'bench'],
+  },
+  {
+    id: 'dumbbell-shoulder-press',
+    name: 'Press de hombros con mancuernas',
+    muscles: 'Hombros y tríceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells', 'bench'],
   },
   {
     id: 'dumbbell-lunge',
@@ -74,6 +118,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'dumbbell',
+    requires: ['dumbbells'],
   },
   {
     id: 'lateral-raise',
@@ -82,6 +127,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'reps',
     equipment: 'dumbbell',
+    requires: ['dumbbells'],
   },
   {
     id: 'biceps-curl',
@@ -90,8 +136,18 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'reps',
     equipment: 'dumbbell',
+    requires: ['dumbbells'],
   },
-  // Gym, machines
+  {
+    id: 'hammer-curl',
+    name: 'Curl martillo',
+    muscles: 'Bíceps y antebrazo',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'dumbbell',
+    requires: ['dumbbells'],
+  },
+  // Machines
   {
     id: 'leg-press',
     name: 'Prensa de piernas',
@@ -99,6 +155,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'machine',
+    requires: ['leg-press'],
   },
   {
     id: 'chest-press-machine',
@@ -107,22 +164,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'machine',
-  },
-  {
-    id: 'lat-pulldown',
-    name: 'Jalón al pecho',
-    muscles: 'Espalda y bíceps',
-    kind: 'compound',
-    tracking: 'reps',
-    equipment: 'machine',
-  },
-  {
-    id: 'seated-cable-row',
-    name: 'Remo sentado en polea',
-    muscles: 'Espalda media y bíceps',
-    kind: 'compound',
-    tracking: 'reps',
-    equipment: 'machine',
+    requires: ['chest-press'],
   },
   {
     id: 'leg-curl',
@@ -131,6 +173,35 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'reps',
     equipment: 'machine',
+    requires: ['leg-curl'],
+  },
+  {
+    id: 'leg-extension',
+    name: 'Extensión de cuádriceps',
+    muscles: 'Cuádriceps',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'machine',
+    requires: ['leg-extension'],
+  },
+  // Cable
+  {
+    id: 'lat-pulldown',
+    name: 'Jalón al pecho',
+    muscles: 'Espalda y bíceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'cable',
+    requires: ['cable'],
+  },
+  {
+    id: 'seated-cable-row',
+    name: 'Remo sentado en polea',
+    muscles: 'Espalda media y bíceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'cable',
+    requires: ['cable'],
   },
   {
     id: 'triceps-pushdown',
@@ -138,7 +209,17 @@ const EXERCISE_LIST: Exercise[] = [
     muscles: 'Tríceps',
     kind: 'isolation',
     tracking: 'reps',
-    equipment: 'machine',
+    equipment: 'cable',
+    requires: ['cable'],
+  },
+  {
+    id: 'face-pull',
+    name: 'Face pull',
+    muscles: 'Hombro posterior y espalda alta',
+    kind: 'isolation',
+    tracking: 'reps',
+    equipment: 'cable',
+    requires: ['cable'],
   },
   // Bodyweight
   {
@@ -148,6 +229,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: [],
   },
   {
     id: 'push-up',
@@ -156,6 +238,16 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: [],
+  },
+  {
+    id: 'pull-up',
+    name: 'Dominadas',
+    muscles: 'Espalda y bíceps',
+    kind: 'compound',
+    tracking: 'reps',
+    equipment: 'bodyweight',
+    requires: ['pull-up-bar'],
   },
   {
     id: 'reverse-lunge',
@@ -164,6 +256,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: [],
   },
   {
     id: 'pike-push-up',
@@ -172,6 +265,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'compound',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: [],
   },
   {
     id: 'glute-bridge',
@@ -180,6 +274,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: ['mat'],
   },
   {
     id: 'superman',
@@ -188,6 +283,7 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'reps',
     equipment: 'bodyweight',
+    requires: ['mat'],
   },
   {
     id: 'plank',
@@ -196,8 +292,12 @@ const EXERCISE_LIST: Exercise[] = [
     kind: 'isolation',
     tracking: 'time',
     equipment: 'bodyweight',
+    requires: ['mat'],
   },
 ];
+
+/** Every exercise, in catalog order. */
+export const EXERCISE_CATALOG: readonly Exercise[] = EXERCISE_LIST;
 
 export const EXERCISES: Readonly<Record<string, Exercise>> = Object.fromEntries(
   EXERCISE_LIST.map((exercise) => [exercise.id, exercise])

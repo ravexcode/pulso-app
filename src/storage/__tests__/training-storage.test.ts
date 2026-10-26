@@ -7,7 +7,7 @@ import {
   saveTraining,
   TRAINING_FILE_NAME,
 } from '@/storage/training-storage';
-import type { WorkoutLog } from '@/types/workout';
+import type { CustomRoutine, WorkoutLog } from '@/types/workout';
 
 // Helpers from the in-memory mock in __mocks__/expo-file-system.ts.
 const { __getFileContent, __resetFiles, __setFileContent } =
@@ -35,6 +35,14 @@ const log: WorkoutLog = {
   ],
 };
 
+const customRoutine: CustomRoutine = {
+  id: 'custom-1',
+  name: 'Mancuernas en casa',
+  exerciseIds: ['goblet-squat', 'biceps-curl'],
+  createdAt: '2026-10-25T10:00:00.000Z',
+  updatedAt: '2026-10-25T10:00:00.000Z',
+};
+
 beforeEach(() => {
   __resetFiles();
 });
@@ -44,8 +52,12 @@ describe('training storage', () => {
     await expect(loadTraining()).resolves.toEqual(EMPTY_TRAINING_DATA);
   });
 
-  it('saves and loads the active routine and the history', async () => {
-    const data = { activeRoutineId: 'full-body-home', history: [log] };
+  it('saves and loads the active routine, the custom routines and the history', async () => {
+    const data = {
+      activeRoutineId: 'full-body-home',
+      customRoutines: [customRoutine],
+      history: [log],
+    };
 
     await saveTraining(data);
 
@@ -59,17 +71,35 @@ describe('training storage', () => {
     await expect(loadTraining()).resolves.toEqual(EMPTY_TRAINING_DATA);
   });
 
-  it('drops only the invalid workouts', async () => {
+  it('drops only the invalid routines and workouts', async () => {
     __setFileContent(
       fileUri,
-      JSON.stringify({ activeRoutineId: 7, history: [log, { ...log, durationSec: 'long' }] })
+      JSON.stringify({
+        activeRoutineId: 7,
+        customRoutines: [customRoutine, { ...customRoutine, exerciseIds: ['unknown'] }],
+        history: [log, { ...log, durationSec: 'long' }],
+      })
     );
 
-    await expect(loadTraining()).resolves.toEqual({ activeRoutineId: null, history: [log] });
+    await expect(loadTraining()).resolves.toEqual({
+      activeRoutineId: null,
+      customRoutines: [customRoutine],
+      history: [log],
+    });
+  });
+
+  it('reads files saved before custom routines existed', async () => {
+    __setFileContent(fileUri, JSON.stringify({ activeRoutineId: 'full-body-a', history: [log] }));
+
+    await expect(loadTraining()).resolves.toEqual({
+      activeRoutineId: 'full-body-a',
+      customRoutines: [],
+      history: [log],
+    });
   });
 
   it('deletes the file', async () => {
-    await saveTraining({ activeRoutineId: 'full-body-a', history: [] });
+    await saveTraining({ activeRoutineId: 'full-body-a', customRoutines: [], history: [] });
 
     deleteTraining();
 

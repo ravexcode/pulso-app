@@ -4,17 +4,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { WorkoutSession } from '@/components/workout/workout-session';
-import { getRoutine } from '@/constants/routines';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
+import { findRoutine } from '@/utils/custom-routine';
 import { planRoutine } from '@/utils/workout-session';
 
 export default function WorkoutScreen() {
   const { routineId } = useLocalSearchParams<{ routineId: string }>();
   const router = useRouter();
   const { user } = useUser();
-  const { history, addWorkout } = useTraining();
-  const routine = getRoutine(routineId);
+  const { history, customRoutines, addWorkout } = useTraining();
+  const routine = findRoutine(routineId, customRoutines);
   // The plan is fixed when the workout starts, even if the profile changes meanwhile.
   const [plan] = useState(() =>
     routine && user ? planRoutine(routine, user.goal, user.level) : []

@@ -5,6 +5,7 @@ import { useTraining } from '@/hooks/use-training';
 import { TrainingProvider } from '@/providers/training-provider';
 import { loadTraining, saveTraining } from '@/storage/training-storage';
 import type { WorkoutLog } from '@/types/workout';
+import { InvalidCustomRoutineError } from '@/utils/custom-routine';
 
 // Helpers from the in-memory mock in __mocks__/expo-file-system.ts.
 const { __resetFiles } =
@@ -40,7 +41,11 @@ describe('TrainingProvider', () => {
   });
 
   it('loads the saved data', async () => {
-    await saveTraining({ activeRoutineId: 'full-body-b', history: [makeLog('1')] });
+    await saveTraining({
+      activeRoutineId: 'full-body-b',
+      customRoutines: [],
+      history: [makeLog('1')],
+    });
 
     const { result } = await renderTrainingHook();
 
@@ -60,8 +65,47 @@ describe('TrainingProvider', () => {
     expect(result.current.history.map((log) => log.id)).toEqual(['2', '1']);
     await expect(loadTraining()).resolves.toEqual({
       activeRoutineId: 'full-body-home',
+      customRoutines: [],
       history: result.current.history,
     });
+  });
+
+  it('creates, updates and deletes custom routines on the device', async () => {
+    const { result } = await renderTrainingHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const created = await act(() =>
+      result.current.saveCustomRoutine({ name: ' Brazos ', exerciseIds: ['biceps-curl'] })
+    );
+    expect(result.current.customRoutines).toEqual([created]);
+    expect(created.name).toBe('Brazos');
+
+    await act(() => result.current.selectRoutine(created.id));
+    await act(() =>
+      result.current.saveCustomRoutine(
+        { name: 'Brazos', exerciseIds: ['biceps-curl', 'hammer-curl'] },
+        created.id
+      )
+    );
+    expect(result.current.customRoutines[0].exerciseIds).toEqual(['biceps-curl', 'hammer-curl']);
+    await expect(loadTraining()).resolves.toMatchObject({
+      customRoutines: result.current.customRoutines,
+    });
+
+    await act(() => result.current.deleteCustomRoutine(created.id));
+    expect(result.current.customRoutines).toEqual([]);
+    // The deleted routine was active, so no routine stays active.
+    expect(result.current.activeRoutineId).toBeNull();
+  });
+
+  it('does not save an invalid custom routine', async () => {
+    const { result } = await renderTrainingHook();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await expect(
+      result.current.saveCustomRoutine({ name: 'Vacía', exerciseIds: [] })
+    ).rejects.toThrow(InvalidCustomRoutineError);
+    await expect(loadTraining()).resolves.toMatchObject({ customRoutines: [] });
   });
 });
 

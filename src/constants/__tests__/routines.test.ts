@@ -33,3 +33,19 @@ describe('routines', () => {
     });
   });
 });
+
+describe('exercise catalog', () => {
+  const exercises = Object.values(EXERCISES);
+
+  it('lists the requirements of every equipment exercise', () => {
+    exercises
+      .filter((exercise) => exercise.equipment !== 'bodyweight')
+      .forEach((exercise) => expect(exercise.requires.length).toBeGreaterThan(0));
+  });
+
+  it('does not repeat requirements', () => {
+    exercises.forEach((exercise) =>
+      expect(new Set(exercise.requires).size).toBe(exercise.requires.length)
+    );
+  });
+});

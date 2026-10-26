@@ -1,5 +1,5 @@
 import type { Goal, Level, Sex, Units } from '@/types/user';
-import type { Effort, Routine } from '@/types/workout';
+import type { Effort, Equipment, Requirement, Routine } from '@/types/workout';
 
 export const SEX_LABELS: Record<Sex, string> = {
   male: 'Hombre',
@@ -35,3 +35,30 @@ export const EFFORT_LABELS: Record<Effort, { title: string; hint: string }> = {
   moderate: { title: 'Exigente', hint: 'Me sobraban 1 o 2 repeticiones' },
   hard: { title: 'Al límite', hint: 'No podía hacer ni una más' },
 };
+
+export const EQUIPMENT_LABELS: Record<Equipment, string> = {
+  barbell: 'Barra',
+  dumbbell: 'Mancuernas',
+  machine: 'Máquinas',
+  cable: 'Polea',
+  bodyweight: 'Peso corporal',
+};
+
+export const REQUIREMENT_LABELS: Record<Requirement, string> = {
+  barbell: 'Barra',
+  plates: 'Discos',
+  rack: 'Rack',
+  bench: 'Banco plano',
+  'incline-bench': 'Banco inclinado',
+  dumbbells: 'Mancuernas',
+  'leg-press': 'Prensa',
+  'chest-press': 'Máquina de press',
+  'leg-curl': 'Máquina de femoral',
+  'leg-extension': 'Máquina de extensión',
+  cable: 'Polea',
+  'pull-up-bar': 'Barra de dominadas',
+  mat: 'Esterilla',
+};
+
+/** Tag for exercises that need nothing. */
+export const NO_REQUIREMENTS_LABEL = 'Sin material';

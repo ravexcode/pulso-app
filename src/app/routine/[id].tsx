@@ -3,12 +3,14 @@ import { Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Card, Screen } from '@/components/ui/screen';
+import { RequirementTags } from '@/components/workout/requirement-tags';
 import { getExercise } from '@/constants/exercises';
 import { GOAL_LABELS, LEVEL_LABELS, PLACE_LABELS } from '@/constants/labels';
-import { getRoutine } from '@/constants/routines';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
 import type { Prescription } from '@/types/workout';
+import { findRoutine } from '@/utils/custom-routine';
+import { getRequirements } from '@/utils/exercise-filter';
 import { formatRest } from '@/utils/format';
 import { estimateRoutineMinutes, getPrescription } from '@/utils/prescription';
 
@@ -22,8 +24,8 @@ export default function RoutineDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useUser();
-  const { activeRoutineId, selectRoutine } = useTraining();
-  const routine = getRoutine(id);
+  const { activeRoutineId, customRoutines, selectRoutine } = useTraining();
+  const routine = findRoutine(id, customRoutines);
 
   if (!user) return null;
   if (!routine) {
@@ -45,8 +47,14 @@ export default function RoutineDetailScreen() {
   return (
     <Screen title={routine.name} subtitle={routine.description} hasHeader>
       <Text className="text-sm text-foreground-subtle">
-        {PLACE_LABELS[routine.place]} · {LEVEL_LABELS[routine.level]} · ~{minutes} min
+        {routine.isCustom ? 'Personalizada' : LEVEL_LABELS[routine.level ?? user.level]} ·{' '}
+        {PLACE_LABELS[routine.place]} · ~{minutes} min
       </Text>
+
+      <View className="gap-2">
+        <Text className="text-sm font-semibold text-foreground-muted">Necesitas</Text>
+        <RequirementTags requirements={getRequirements(routine.exerciseIds)} />
+      </View>
 
       <Card>
         <Text className="text-sm text-foreground-muted">
@@ -73,6 +81,7 @@ export default function RoutineDetailScreen() {
               <Text className="text-sm text-foreground-muted">
                 {describeTarget(prescription)} · Descanso {formatRest(prescription.rest.base)}
               </Text>
+              <RequirementTags requirements={exercise.requires} />
             </Card>
           );
         })}
@@ -86,6 +95,13 @@ export default function RoutineDetailScreen() {
           disabled={isActive}
           onPress={() => void selectRoutine(routine.id)}
         />
+        {routine.isCustom && (
+          <Button
+            title="Editar rutina"
+            variant="secondary"
+            onPress={() => router.push({ pathname: '/routine-editor', params: { id: routine.id } })}
+          />
+        )}
       </View>
     </Screen>
   );

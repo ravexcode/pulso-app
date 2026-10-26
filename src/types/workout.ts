@@ -9,7 +9,25 @@ export type ExerciseKind = 'compound' | 'isolation';
 /** `reps` sets count repetitions; `time` sets hold a position, like a plank. */
 export type ExerciseTracking = 'reps' | 'time';
 
-export type Equipment = 'barbell' | 'dumbbell' | 'machine' | 'bodyweight';
+/** Main equipment of an exercise. The exercise filters use it. */
+export const EQUIPMENT = ['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight'] as const;
+export type Equipment = (typeof EQUIPMENT)[number];
+
+/** Everything an exercise needs, shown as tags. An empty list means no material at all. */
+export type Requirement =
+  | 'barbell'
+  | 'plates'
+  | 'rack'
+  | 'bench'
+  | 'incline-bench'
+  | 'dumbbells'
+  | 'leg-press'
+  | 'chest-press'
+  | 'leg-curl'
+  | 'leg-extension'
+  | 'cable'
+  | 'pull-up-bar'
+  | 'mat';
 
 export type Exercise = {
   id: string;
@@ -19,6 +37,7 @@ export type Exercise = {
   kind: ExerciseKind;
   tracking: ExerciseTracking;
   equipment: Equipment;
+  requires: Requirement[];
 };
 
 export type Routine = {
@@ -26,10 +45,23 @@ export type Routine = {
   name: string;
   description: string;
   place: 'gym' | 'home';
-  /** Level the routine is designed for. Any user can still choose it. */
-  level: Level;
+  /** Level the routine is designed for. Any user can still choose it. Missing in custom routines. */
+  level?: Level;
+  /** `true` for routines the user built by choosing exercises. */
+  isCustom?: boolean;
   /** Exercise ids in the order they are performed. */
   exerciseIds: string[];
+};
+
+/** Routine the user built. It is saved on the device; `toRoutine` turns it into a `Routine`. */
+export type CustomRoutine = {
+  id: string;
+  name: string;
+  exerciseIds: string[];
+  /** ISO 8601 timestamp. */
+  createdAt: string;
+  /** ISO 8601 timestamp. */
+  updatedAt: string;
 };
 
 /** How hard a set felt, measured as repetitions in reserve. */

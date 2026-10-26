@@ -4,9 +4,9 @@ import { Text, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Card, Screen } from '@/components/ui/screen';
 import { GOAL_LABELS } from '@/constants/labels';
-import { getRoutine } from '@/constants/routines';
 import { useTraining } from '@/hooks/use-training';
 import { useUser } from '@/hooks/use-user';
+import { findRoutine } from '@/utils/custom-routine';
 import { formatDuration } from '@/utils/format';
 import { estimateRoutineMinutes } from '@/utils/prescription';
 import { countWorkoutsThisWeek, summarizeWorkout } from '@/utils/workout-log';
@@ -14,11 +14,11 @@ import { countWorkoutsThisWeek, summarizeWorkout } from '@/utils/workout-log';
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useUser();
-  const { activeRoutineId, history } = useTraining();
+  const { activeRoutineId, customRoutines, history } = useTraining();
 
   if (!user) return null;
 
-  const routine = activeRoutineId ? getRoutine(activeRoutineId) : undefined;
+  const routine = findRoutine(activeRoutineId ?? undefined, customRoutines);
   const doneThisWeek = countWorkoutsThisWeek(history);
   const weeklyGoal = user.trainingDaysPerWeek;
   const lastWorkout = history[0];
@@ -68,7 +68,7 @@ export default function HomeScreen() {
         <Card>
           <Text className="text-2xl font-bold text-foreground">Elige tu rutina</Text>
           <Text className="text-base text-foreground-muted">
-            Tenemos rutinas de cuerpo completo para gimnasio y para casa.
+            Usa un plan full body o arma tu rutina eligiendo tus ejercicios.
           </Text>
           <Button title="Ver rutinas" onPress={() => router.push('/routines')} />
         </Card>

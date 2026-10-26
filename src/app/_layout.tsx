@@ -39,6 +39,10 @@ function RootNavigator() {
             name="routine/[id]"
             options={{ headerShown: true, title: '', headerShadowVisible: false }}
           />
+          <Stack.Screen
+            name="routine-editor"
+            options={{ headerShown: true, title: '', headerShadowVisible: false }}
+          />
           <Stack.Screen name="workout/[routineId]" options={{ gestureEnabled: false }} />
         </Stack.Protected>
         <Stack.Protected guard={!hasUser}>

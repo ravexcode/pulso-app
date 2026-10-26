@@ -20,6 +20,7 @@ const WEIGHT_HINTS: Record<Exercise['equipment'], string> = {
   barbell: 'Total: barra y discos.',
   dumbbell: 'De una sola mancuerna.',
   machine: 'El que marca la máquina.',
+  cable: 'El que marca la polea.',
   bodyweight: '',
 };
 

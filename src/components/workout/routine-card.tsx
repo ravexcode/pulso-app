@@ -1,8 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
 
+import { RequirementTags } from '@/components/workout/requirement-tags';
 import { LEVEL_LABELS, PLACE_LABELS } from '@/constants/labels';
 import type { Goal, Level } from '@/types/user';
 import type { Routine } from '@/types/workout';
+import { getRequirements } from '@/utils/exercise-filter';
 import { estimateRoutineMinutes } from '@/utils/prescription';
 
 type RoutineCardProps = {
@@ -44,14 +46,16 @@ export function RoutineCard({
       <View className="flex-row flex-wrap gap-2">
         {isActive && <Badge label="Activa" filled />}
         {isRecommended && <Badge label="Recomendada" />}
+        {routine.isCustom && <Badge label="Personalizada" />}
         <Badge label={PLACE_LABELS[routine.place]} />
-        <Badge label={LEVEL_LABELS[routine.level]} />
+        {routine.level && <Badge label={LEVEL_LABELS[routine.level]} />}
       </View>
       <Text className="text-xl font-bold text-foreground">{routine.name}</Text>
       <Text className="text-base text-foreground-muted">{routine.description}</Text>
       <Text className="text-sm text-foreground-subtle">
         {routine.exerciseIds.length} ejercicios · ~{minutes} min
       </Text>
+      <RequirementTags requirements={getRequirements(routine.exerciseIds)} />
     </Pressable>
   );
 }

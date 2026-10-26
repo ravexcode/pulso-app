@@ -1,3 +1,4 @@
+
 name: Android build
 
 on:
@@ -12,24 +13,43 @@ jobs:
   build:
     name: EAS Android preview build
     runs-on: ubuntu-latest
+
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.13.x
           cache: pnpm
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Verify Expo token
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN is missing"
+            exit 1
+          fi
+
       - name: Configure EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Verify authentication
+        run: eas whoami
+
       - name: Build Android
         run: eas build --platform android --profile preview --non-interactive
